@@ -1,0 +1,11 @@
+ProductKey,Product Line,Product BU,Revenue Type,Product Order
+0,Not Applicable,Not Applicable,Not Applicable,99
+1,Automation Systems,Industrial Solutions,Product,1
+2,Sensors & Controls,Industrial Solutions,Product,2
+3,Field Services,Industrial Solutions,Service,3
+4,Home Appliances,Consumer Products,Product,4
+5,Personal Care,Consumer Products,Product,5
+6,Smart Home,Consumer Products,Product,6
+7,Analytics Cloud,Digital Services,Subscription,7
+8,IoT Platform,Digital Services,Subscription,8
+9,Professional Services,Digital Services,Service,9

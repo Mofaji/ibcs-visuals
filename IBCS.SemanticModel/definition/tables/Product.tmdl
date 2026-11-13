@@ -1,0 +1,51 @@
+/// Product lines (revenue and cost of sales rows only).
+table Product
+	lineageTag: 674e67ba-4eaa-5e74-ab69-e95a1fbeefdc
+
+	column ProductKey
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 811fd8ac-262c-52f3-a167-a95ebb241990
+		summarizeBy: none
+		sourceColumn: ProductKey
+
+	column 'Product Line'
+		dataType: string
+		lineageTag: 40973d19-b94a-5413-917d-ab0e354a0b47
+		summarizeBy: none
+		sourceColumn: Product Line
+		sortByColumn: 'Product Order'
+
+	column 'Product BU'
+		dataType: string
+		lineageTag: 77dc0031-816d-51d1-a1d3-de2d7a46dff0
+		summarizeBy: none
+		sourceColumn: Product BU
+
+	column 'Revenue Type'
+		dataType: string
+		lineageTag: a5f0e9ab-a330-5fe0-90b5-361b5a1b29e7
+		summarizeBy: none
+		sourceColumn: Revenue Type
+
+	column 'Product Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 3c31c7a4-c7ab-5689-92a9-d2780393e0f8
+		summarizeBy: none
+		sourceColumn: Product Order
+
+	partition Product = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "DimProduct.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"ProductKey", Int64.Type}, {"Product Line", type text}, {"Product BU", type text}, {"Revenue Type", type text}, {"Product Order", Int64.Type}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+

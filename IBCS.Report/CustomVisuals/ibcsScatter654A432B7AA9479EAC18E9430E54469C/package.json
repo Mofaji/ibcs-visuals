@@ -1,0 +1,17 @@
+{
+		"version": "1.0.0.2",
+		"author": {"name":"Faizaan","email":"Contact@faizaan.me"},
+		"resources": [
+			{
+				"resourceId": "rId0",
+				"sourceType": 5,
+				"file": "resources/ibcsScatter654A432B7AA9479EAC18E9430E54469C.pbiviz.json"
+			}
+		],
+		"visual": {"name":"ibcsScatter","displayName":"IBCS Scatter Chart","guid":"ibcsScatter654A432B7AA9479EAC18E9430E54469C","visualClassName":"Visual","version":"1.0.0.2","description":"IBCS scattergram and bubble chart with iso-lines","supportUrl":"https://learn.microsoft.com/power-bi/developer/visuals/","gitHubUrl":""},
+		"metadata": {
+			"pbivizjson": {
+				"resourceId": "rId0"
+			}
+		}
+	}

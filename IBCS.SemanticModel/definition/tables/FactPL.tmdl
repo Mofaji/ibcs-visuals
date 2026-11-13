@@ -1,0 +1,88 @@
+/// Monthly P&L amounts in USD. Revenue positive, costs negative. Scenarios Actual, Budget, Forecast (6+6).
+table FactPL
+	lineageTag: 69443f24-7dac-553a-ade9-03744a8bb333
+
+	column Date
+		dataType: dateTime
+		isHidden
+		formatString: dd mmm yyyy
+		lineageTag: 4e65d8c2-fd01-54d0-9e44-ca77545f8c12
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column AccountKey
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 71255a28-d029-586c-af85-8c094052aeb2
+		summarizeBy: none
+		sourceColumn: AccountKey
+
+	column BUKey
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 7a6fb306-ac35-5007-a959-da612847d4a6
+		summarizeBy: none
+		sourceColumn: BUKey
+
+	column RegionKey
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 987209b1-ce60-5ccd-81fe-71fe7a781812
+		summarizeBy: none
+		sourceColumn: RegionKey
+
+	column ProductKey
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: e7f0e741-2289-5e09-b46a-08676463f509
+		summarizeBy: none
+		sourceColumn: ProductKey
+
+	column ChannelKey
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 3d1407fc-1650-575d-a7c0-d08f9b8f3906
+		summarizeBy: none
+		sourceColumn: ChannelKey
+
+	column DepartmentKey
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: ad9c6d62-31a6-5bf9-a449-2d5f7863a7a9
+		summarizeBy: none
+		sourceColumn: DepartmentKey
+
+	column Scenario
+		dataType: string
+		lineageTag: 1a39fc02-0e9e-5e8a-841e-04832d4b883a
+		summarizeBy: none
+		sourceColumn: Scenario
+
+	column Amount
+		dataType: double
+		isHidden
+		formatString: #,0
+		lineageTag: 604fd8f9-bbf5-5217-b1a3-1c2013d94e7a
+		summarizeBy: none
+		sourceColumn: Amount
+
+	partition FactPL = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "FactPL.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"Date", type date}, {"AccountKey", Int64.Type}, {"BUKey", Int64.Type}, {"RegionKey", Int64.Type}, {"ProductKey", Int64.Type}, {"ChannelKey", Int64.Type}, {"DepartmentKey", Int64.Type}, {"Scenario", type text}, {"Amount", type number}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+

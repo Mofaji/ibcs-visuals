@@ -1,0 +1,56 @@
+/// Monthly cash flows per legal entity, derived from P&L and balance sheet movements.
+table FactCF
+	lineageTag: 1e69a3a5-9a72-5a08-a07c-20501b1042ae
+
+	column Date
+		dataType: dateTime
+		isHidden
+		formatString: dd mmm yyyy
+		lineageTag: cec0e921-41bb-5229-8d24-615a9fab4848
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column CFLineKey
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 7467fd0a-5182-5228-84a3-32079c8a3bc1
+		summarizeBy: none
+		sourceColumn: CFLineKey
+
+	column RegionKey
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 77554c93-8040-59b1-8a88-b7b6ad1250ff
+		summarizeBy: none
+		sourceColumn: RegionKey
+
+	column Scenario
+		dataType: string
+		lineageTag: de1ae83a-88f5-547b-b244-2c0c7100b8ec
+		summarizeBy: none
+		sourceColumn: Scenario
+
+	column Amount
+		dataType: double
+		isHidden
+		formatString: #,0
+		lineageTag: a38cd4d6-0d8b-5378-8dd5-d4dfd40d2fa6
+		summarizeBy: none
+		sourceColumn: Amount
+
+	partition FactCF = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "FactCF.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"Date", type date}, {"CFLineKey", Int64.Type}, {"RegionKey", Int64.Type}, {"Scenario", type text}, {"Amount", type number}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+

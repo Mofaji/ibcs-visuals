@@ -1,0 +1,51 @@
+/// Regions; each region is one legal entity with its own balance sheet.
+table Region
+	lineageTag: 55ac8948-77d1-51dd-b3bf-7ba0e9c4f884
+
+	column RegionKey
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 325010f0-69be-5ee6-95f6-c084b3180ccc
+		summarizeBy: none
+		sourceColumn: RegionKey
+
+	column Region
+		dataType: string
+		lineageTag: 29a5dd4d-7086-5693-872a-0b74bd131f15
+		summarizeBy: none
+		sourceColumn: Region
+		sortByColumn: 'Region Order'
+
+	column 'Legal Entity'
+		dataType: string
+		lineageTag: 08ef17aa-a150-5ea6-b7ea-f0de265b68cb
+		summarizeBy: none
+		sourceColumn: Legal Entity
+
+	column 'HQ Country'
+		dataType: string
+		lineageTag: 30b21240-c044-57a2-b2df-455d37292ecf
+		summarizeBy: none
+		sourceColumn: HQ Country
+
+	column 'Region Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 39c36388-6ca3-518a-b0b5-6496fb47907c
+		summarizeBy: none
+		sourceColumn: Region Order
+
+	partition Region = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "DimRegion.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"RegionKey", Int64.Type}, {"Region", type text}, {"Legal Entity", type text}, {"HQ Country", type text}, {"Region Order", Int64.Type}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+

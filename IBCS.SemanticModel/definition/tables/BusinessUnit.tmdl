@@ -1,0 +1,45 @@
+/// Business units. P&L and headcount only - balance sheet and cash flow are by legal entity.
+table BusinessUnit
+	lineageTag: cfa6af29-d6ff-55fe-8c53-8aea8a682f57
+
+	column BUKey
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 2fdb7de3-ec78-57fe-ad70-486ee7a9d716
+		summarizeBy: none
+		sourceColumn: BUKey
+
+	column 'Business Unit'
+		dataType: string
+		lineageTag: 4a836533-80c1-56ef-af41-2fd85ab37b82
+		summarizeBy: none
+		sourceColumn: Business Unit
+		sortByColumn: 'BU Order'
+
+	column 'BU Code'
+		dataType: string
+		lineageTag: 2bff6fcf-4b7b-5397-8faf-ce2ccd196da9
+		summarizeBy: none
+		sourceColumn: BU Code
+
+	column 'BU Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 24b9e954-6540-5980-9f8d-a1077208bf7e
+		summarizeBy: none
+		sourceColumn: BU Order
+
+	partition BusinessUnit = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "DimBusinessUnit.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"BUKey", Int64.Type}, {"Business Unit", type text}, {"BU Code", type text}, {"BU Order", Int64.Type}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,382 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "p14_cards",
+  "position": {
+    "x": 34,
+    "y": 104,
+    "z": 1010,
+    "height": 102,
+    "width": 1212,
+    "tabOrder": 1010
+  },
+  "visual": {
+    "visualType": "ibcsCardsFEEACD80288B404D9FA2AD5E9F82B305",
+    "query": {
+      "queryState": {
+        "category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Calendar"
+                    }
+                  },
+                  "Property": "Month Start"
+                }
+              },
+              "queryRef": "Calendar.Month Start",
+              "nativeQueryRef": "Month Start",
+              "displayName": "Month"
+            }
+          ]
+        },
+        "ac": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Net Revenue Monthly AC"
+                }
+              },
+              "queryRef": "_Measures.Net Revenue Monthly AC",
+              "nativeQueryRef": "Net Revenue Monthly AC",
+              "displayName": "Net revenue"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Gross Profit Monthly AC"
+                }
+              },
+              "queryRef": "_Measures.Gross Profit Monthly AC",
+              "nativeQueryRef": "Gross Profit Monthly AC",
+              "displayName": "Gross profit"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "EBITDA Monthly AC"
+                }
+              },
+              "queryRef": "_Measures.EBITDA Monthly AC",
+              "nativeQueryRef": "EBITDA Monthly AC",
+              "displayName": "EBITDA"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Net Income Monthly AC"
+                }
+              },
+              "queryRef": "_Measures.Net Income Monthly AC",
+              "nativeQueryRef": "Net Income Monthly AC",
+              "displayName": "Net income"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "OPEX Monthly AC"
+                }
+              },
+              "queryRef": "_Measures.OPEX Monthly AC",
+              "nativeQueryRef": "OPEX Monthly AC",
+              "displayName": "Operating expenses"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Free Cash Flow Monthly AC"
+                }
+              },
+              "queryRef": "_Measures.Free Cash Flow Monthly AC",
+              "nativeQueryRef": "Free Cash Flow Monthly AC",
+              "displayName": "Free cash flow"
+            }
+          ]
+        },
+        "pm": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Net Revenue Monthly PM"
+                }
+              },
+              "queryRef": "_Measures.Net Revenue Monthly PM",
+              "nativeQueryRef": "Net Revenue Monthly PM",
+              "displayName": "Net revenue BU"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Gross Profit Monthly PM"
+                }
+              },
+              "queryRef": "_Measures.Gross Profit Monthly PM",
+              "nativeQueryRef": "Gross Profit Monthly PM",
+              "displayName": "Gross profit BU"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "EBITDA Monthly PM"
+                }
+              },
+              "queryRef": "_Measures.EBITDA Monthly PM",
+              "nativeQueryRef": "EBITDA Monthly PM",
+              "displayName": "EBITDA BU"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Net Income Monthly PM"
+                }
+              },
+              "queryRef": "_Measures.Net Income Monthly PM",
+              "nativeQueryRef": "Net Income Monthly PM",
+              "displayName": "Net income BU"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "OPEX Monthly PM"
+                }
+              },
+              "queryRef": "_Measures.OPEX Monthly PM",
+              "nativeQueryRef": "OPEX Monthly PM",
+              "displayName": "Operating expenses BU"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Free Cash Flow Monthly PM"
+                }
+              },
+              "queryRef": "_Measures.Free Cash Flow Monthly PM",
+              "nativeQueryRef": "Free Cash Flow Monthly PM",
+              "displayName": "Free cash flow BU"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "cards": [
+        {
+          "properties": {
+            "unit": {
+              "expr": {
+                "Literal": {
+                  "Value": "'K'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            },
+            "pmLabel": {
+              "expr": {
+                "Literal": {
+                  "Value": "'BU'"
+                }
+              }
+            },
+            "invertList": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Operating expenses'"
+                }
+              }
+            },
+            "showSpark": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "dropShadow": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "fy_p14_cards",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Calendar"
+              }
+            },
+            "Property": "Year"
+          }
+        },
+        "type": "Categorical",
+        "filter": {
+          "Version": 2,
+          "From": [
+            {
+              "Name": "t",
+              "Entity": "Calendar",
+              "Type": 0
+            }
+          ],
+          "Where": [
+            {
+              "Condition": {
+                "In": {
+                  "Expressions": [
+                    {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Source": "t"
+                          }
+                        },
+                        "Property": "Year"
+                      }
+                    }
+                  ],
+                  "Values": [
+                    [
+                      {
+                        "Literal": {
+                          "Value": "2026L"
+                        }
+                      }
+                    ]
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "howCreated": "User"
+      }
+    ]
+  }
+}

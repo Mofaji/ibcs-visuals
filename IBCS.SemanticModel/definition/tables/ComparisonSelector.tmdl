@@ -1,0 +1,25 @@
+/// Disconnected table behind the Compare toggle (comparison scenario).
+table ComparisonSelector
+	lineageTag: 3c7cc8cb-726d-5854-ba4c-88f6bfd7a13d
+
+	column Comparison
+		dataType: string
+		lineageTag: b9936acd-fb30-58b9-bf93-0a6cc06323f5
+		summarizeBy: none
+		sourceColumn: Comparison
+		sortByColumn: 'Comparison Order'
+
+	column 'Comparison Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 107391f9-264b-5403-bcd7-c5e88552e5b8
+		summarizeBy: none
+		sourceColumn: Comparison Order
+
+	partition ComparisonSelector = m
+		mode: import
+		source = #table(type table [Comparison = text, #"Comparison Order" = Int64.Type], {{"Budget", 1}, {"Prior Year", 2}, {"Forecast", 3}})
+
+	annotation PBI_ResultType = Table
+

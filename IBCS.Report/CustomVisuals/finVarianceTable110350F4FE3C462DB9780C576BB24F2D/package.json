@@ -1,0 +1,17 @@
+{
+		"version": "1.0.0.2",
+		"author": {"name":"Faizaan","email":"Contact@faizaan.me"},
+		"resources": [
+			{
+				"resourceId": "rId0",
+				"sourceType": 5,
+				"file": "resources/finVarianceTable110350F4FE3C462DB9780C576BB24F2D.pbiviz.json"
+			}
+		],
+		"visual": {"name":"finVarianceTable","displayName":"IBCS Statement Table","guid":"finVarianceTable110350F4FE3C462DB9780C576BB24F2D","visualClassName":"Visual","version":"1.0.0.2","description":"IBCS statement table: variance and cross-tab layouts, running results, ratio rows","supportUrl":"https://learn.microsoft.com/power-bi/developer/visuals/","gitHubUrl":""},
+		"metadata": {
+			"pbivizjson": {
+				"resourceId": "rId0"
+			}
+		}
+	}

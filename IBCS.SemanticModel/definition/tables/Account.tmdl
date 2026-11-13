@@ -1,0 +1,89 @@
+/// P&L chart of accounts. Statement Line holds the running result each account leads to.
+table Account
+	lineageTag: 47ed056e-d656-55e1-8fae-db500a83dc1b
+
+	column AccountKey
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: e99a7b8f-74a5-58b1-a71e-acc00e6b6b3f
+		summarizeBy: none
+		sourceColumn: AccountKey
+
+	column Account
+		dataType: string
+		lineageTag: c9e7b94b-e3dd-5e8f-b423-ed7dd745e3ea
+		summarizeBy: none
+		sourceColumn: Account
+		sortByColumn: 'Account Order'
+
+	column 'Statement Line'
+		dataType: string
+		lineageTag: 5b292970-f618-5c76-9c1e-8697da62f637
+		summarizeBy: none
+		sourceColumn: Statement Line
+		sortByColumn: 'Line Order'
+
+	column 'Line Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 83121610-14f3-52ce-9b41-e3d627bdb24e
+		summarizeBy: none
+		sourceColumn: Line Order
+
+	column 'Account Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 7004db9f-bd08-5f92-bccc-3364eeb63314
+		summarizeBy: none
+		sourceColumn: Account Order
+
+	column 'Account Class'
+		dataType: string
+		lineageTag: 022cb14c-cb5a-59dd-a1a6-ca085145a834
+		summarizeBy: none
+		sourceColumn: Account Class
+		sortByColumn: 'Class Order'
+
+	column 'Class Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: cbacd32c-96b3-5aea-8365-154ab03ecfbf
+		summarizeBy: none
+		sourceColumn: Class Order
+
+	column 'Class Short'
+		dataType: string
+		lineageTag: 77cd7d58-e046-5135-ad43-6a76b408d5d3
+		summarizeBy: none
+		sourceColumn: Class Short
+		sortByColumn: 'Class Order'
+
+	column 'Line Short'
+		dataType: string
+		lineageTag: 3f1f4af5-3b87-5c45-81eb-90d11107be0a
+		summarizeBy: none
+		sourceColumn: Line Short
+		sortByColumn: 'Line Order'
+
+	column 'Expense Category'
+		dataType: string
+		lineageTag: 0b15fd49-7bfd-5895-a90f-f7a59b4de7d1
+		summarizeBy: none
+		sourceColumn: Expense Category
+
+	partition Account = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "DimAccount.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"AccountKey", Int64.Type}, {"Account", type text}, {"Statement Line", type text}, {"Line Order", Int64.Type}, {"Account Order", Int64.Type}, {"Account Class", type text}, {"Class Order", Int64.Type}, {"Class Short", type text}, {"Line Short", type text}, {"Expense Category", type text}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+

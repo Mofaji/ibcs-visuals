@@ -1,0 +1,23 @@
+AccountKey,Account,Statement Line,Line Order,Account Order,Account Class,Class Order,Class Short,Line Short,Expense Category
+1010,Product Revenue,Net Revenue,1,1,Revenue,1,Revenue,Net revenue,Not Applicable
+1020,Service Revenue,Net Revenue,1,2,Revenue,1,Revenue,Net revenue,Not Applicable
+1030,Subscription Revenue,Net Revenue,1,3,Revenue,1,Revenue,Net revenue,Not Applicable
+1040,Discounts & Returns,Net Revenue,1,4,Revenue,1,Revenue,Net revenue,Not Applicable
+2010,Direct Materials,Gross Profit,2,5,Cost of Sales,2,COGS,Gross profit,Not Applicable
+2020,Direct Labour,Gross Profit,2,6,Cost of Sales,2,COGS,Gross profit,Not Applicable
+2030,Manufacturing Overhead,Gross Profit,2,7,Cost of Sales,2,COGS,Gross profit,Not Applicable
+2040,Freight & Logistics,Gross Profit,2,8,Cost of Sales,2,COGS,Gross profit,Not Applicable
+2050,Hosting & Delivery,Gross Profit,2,9,Cost of Sales,2,COGS,Gross profit,Not Applicable
+3010,Salaries & Benefits,EBITDA,3,10,Operating Expenses,3,OPEX,EBITDA,Personnel
+3020,Marketing & Advertising,EBITDA,3,11,Operating Expenses,3,OPEX,EBITDA,Marketing
+3030,Rent & Facilities,EBITDA,3,12,Operating Expenses,3,OPEX,EBITDA,Facilities
+3040,IT & Software,EBITDA,3,13,Operating Expenses,3,OPEX,EBITDA,Technology
+3050,Professional Fees,EBITDA,3,14,Operating Expenses,3,OPEX,EBITDA,Professional Fees
+3060,Travel & Entertainment,EBITDA,3,15,Operating Expenses,3,OPEX,EBITDA,Travel
+3070,General & Administrative,EBITDA,3,16,Operating Expenses,3,OPEX,EBITDA,General & Admin
+4010,Depreciation,EBIT,4,17,Depreciation & Amortization,4,D&A,EBIT,Not Applicable
+4020,Amortization,EBIT,4,18,Depreciation & Amortization,4,D&A,EBIT,Not Applicable
+5010,Interest Income,Profit Before Tax,5,19,Financial Result,5,Fin. result,PBT,Not Applicable
+5020,Interest Expense,Profit Before Tax,5,20,Financial Result,5,Fin. result,PBT,Not Applicable
+5030,FX Gains & Losses,Profit Before Tax,5,21,Financial Result,5,Fin. result,PBT,Not Applicable
+6010,Income Tax,Net Income,6,22,Income Tax,6,Tax,Net income,Not Applicable

@@ -1,0 +1,39 @@
+/// Sales channels (revenue and cost of sales rows only).
+table SalesChannel
+	lineageTag: ff2fdde0-2e6a-59ff-bd56-82604661f254
+
+	column ChannelKey
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 96004db7-492c-5dc7-92af-28cf248ae381
+		summarizeBy: none
+		sourceColumn: ChannelKey
+
+	column Channel
+		dataType: string
+		lineageTag: e671a096-0ef0-5e62-85f5-6e761a6e2486
+		summarizeBy: none
+		sourceColumn: Channel
+		sortByColumn: 'Channel Order'
+
+	column 'Channel Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: b62e5385-4d31-5d66-85d0-5d646b63cb2b
+		summarizeBy: none
+		sourceColumn: Channel Order
+
+	partition SalesChannel = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "DimChannel.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"ChannelKey", Int64.Type}, {"Channel", type text}, {"Channel Order", Int64.Type}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+

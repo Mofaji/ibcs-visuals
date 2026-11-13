@@ -1,0 +1,20 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/pagesMetadata/1.0.0/schema.json",
+  "pageOrder": [
+    "p01_multitier",
+    "p02_waterfalls",
+    "p03_lines",
+    "p04_scatter",
+    "p05_c12c13",
+    "p06_t01",
+    "p07_t02",
+    "p08_t03",
+    "p09_t04",
+    "p10_integrated",
+    "p11_segcombo",
+    "p12_dots",
+    "p13_stacked",
+    "p14_cards"
+  ],
+  "activePageName": "p01_multitier"
+}

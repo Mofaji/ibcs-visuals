@@ -1,0 +1,16 @@
+BSAccountKey,BS Account,BS Level 1,BS Level 1 Order,BS Level 2,BS Level 2 Order,BS Account Order,BS Metric
+110,Cash & Cash Equivalents,Assets,1,Current Assets,1,1,CASH
+120,Accounts Receivable,Assets,1,Current Assets,1,2,AR
+130,Inventory,Assets,1,Current Assets,1,3,INV
+140,Prepaid Expenses & Other,Assets,1,Current Assets,1,4,PREP
+150,"Property, Plant & Equipment",Assets,1,Non-current Assets,2,5,PPE
+160,Intangible Assets,Assets,1,Non-current Assets,2,6,INTANG
+170,Goodwill,Assets,1,Non-current Assets,2,7,GW
+210,Accounts Payable,Liabilities,2,Current Liabilities,3,8,AP
+220,Accrued Liabilities,Liabilities,2,Current Liabilities,3,9,ACCR
+230,Income Tax Payable,Liabilities,2,Current Liabilities,3,10,TAXPAY
+240,Short-term Debt,Liabilities,2,Current Liabilities,3,11,STD
+250,Long-term Debt,Liabilities,2,Non-current Liabilities,4,12,LTD
+260,Lease & Other Liabilities,Liabilities,2,Non-current Liabilities,4,13,ONCL
+310,Share Capital,Equity,3,Shareholders' Equity,5,14,SHARECAP
+320,Retained Earnings,Equity,3,Shareholders' Equity,5,15,RE

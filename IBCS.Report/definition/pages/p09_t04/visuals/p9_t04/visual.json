@@ -1,0 +1,293 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "p9_t04",
+  "position": {
+    "x": 34,
+    "y": 104,
+    "z": 1010,
+    "height": 464,
+    "width": 1212,
+    "tabOrder": 1010
+  },
+  "visual": {
+    "visualType": "finVarianceTable110350F4FE3C462DB9780C576BB24F2D",
+    "query": {
+      "queryState": {
+        "rows": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Account"
+                    }
+                  },
+                  "Property": "Statement Line"
+                }
+              },
+              "queryRef": "Account.Statement Line",
+              "nativeQueryRef": "Statement Line"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Account"
+                    }
+                  },
+                  "Property": "Account"
+                }
+              },
+              "queryRef": "Account.Account",
+              "nativeQueryRef": "Account"
+            }
+          ]
+        },
+        "rowOrder": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Account"
+                    }
+                  },
+                  "Property": "Line Order"
+                }
+              },
+              "queryRef": "Account.Line Order",
+              "nativeQueryRef": "Line Order"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Account"
+                    }
+                  },
+                  "Property": "Account Order"
+                }
+              },
+              "queryRef": "Account.Account Order",
+              "nativeQueryRef": "Account Order"
+            }
+          ]
+        },
+        "ac": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Amount AC"
+                }
+              },
+              "queryRef": "_Measures.Amount AC",
+              "nativeQueryRef": "Amount AC",
+              "displayName": "AC"
+            }
+          ]
+        },
+        "pm": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Amount PM"
+                }
+              },
+              "queryRef": "_Measures.Amount PM",
+              "nativeQueryRef": "Amount PM",
+              "displayName": "Comparison"
+            }
+          ]
+        },
+        "pmName": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Comparison Code"
+                }
+              },
+              "queryRef": "_Measures.Comparison Code",
+              "nativeQueryRef": "Comparison Code",
+              "displayName": "Scenario"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "statement": [
+        {
+          "properties": {
+            "groupTotal": {
+              "expr": {
+                "Literal": {
+                  "Value": "'running'"
+                }
+              }
+            },
+            "showRatios": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "resultPosition": {
+              "expr": {
+                "Literal": {
+                  "Value": "'auto'"
+                }
+              }
+            },
+            "collapsed": {
+              "expr": {
+                "Literal": {
+                  "Value": "'EBITDA'"
+                }
+              }
+            },
+            "hideEmpty": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "colorMode": {
+              "expr": {
+                "Literal": {
+                  "Value": "'normal'"
+                }
+              }
+            },
+            "varianceStyle": {
+              "expr": {
+                "Literal": {
+                  "Value": "'waterfall'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "display": [
+        {
+          "properties": {
+            "unit": {
+              "expr": {
+                "Literal": {
+                  "Value": "'K'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            },
+            "rowHeight": {
+              "expr": {
+                "Literal": {
+                  "Value": "16D"
+                }
+              }
+            },
+            "acLabel": {
+              "expr": {
+                "Literal": {
+                  "Value": "'AC'"
+                }
+              }
+            },
+            "pyLabel": {
+              "expr": {
+                "Literal": {
+                  "Value": "'PY'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "dropShadow": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

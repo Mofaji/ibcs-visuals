@@ -1,0 +1,6 @@
+expression DataFolder = "C:\path\to\ibcs-visuals\data\" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 676543f3-8376-5e74-8ffe-c1c46bd6d94e
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Text

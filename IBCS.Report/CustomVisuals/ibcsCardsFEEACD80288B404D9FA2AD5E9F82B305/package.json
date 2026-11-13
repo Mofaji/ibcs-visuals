@@ -1,0 +1,17 @@
+{
+		"version": "1.0.0.2",
+		"author": {"name":"Faizaan","email":"Contact@faizaan.me"},
+		"resources": [
+			{
+				"resourceId": "rId0",
+				"sourceType": 5,
+				"file": "resources/ibcsCardsFEEACD80288B404D9FA2AD5E9F82B305.pbiviz.json"
+			}
+		],
+		"visual": {"name":"ibcsCards","displayName":"IBCS KPI Cards","guid":"ibcsCardsFEEACD80288B404D9FA2AD5E9F82B305","visualClassName":"Visual","version":"1.0.0.2","description":"IBCS KPI cards with variance and sparkline","supportUrl":"https://learn.microsoft.com/power-bi/developer/visuals/","gitHubUrl":""},
+		"metadata": {
+			"pbivizjson": {
+				"resourceId": "rId0"
+			}
+		}
+	}

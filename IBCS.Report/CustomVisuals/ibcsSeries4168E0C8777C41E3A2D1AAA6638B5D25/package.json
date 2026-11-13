@@ -1,0 +1,17 @@
+{
+		"version": "1.0.0.2",
+		"author": {"name":"Faizaan","email":"Contact@faizaan.me"},
+		"resources": [
+			{
+				"resourceId": "rId0",
+				"sourceType": 5,
+				"file": "resources/ibcsSeries4168E0C8777C41E3A2D1AAA6638B5D25.pbiviz.json"
+			}
+		],
+		"visual": {"name":"ibcsSeries","displayName":"IBCS Series Chart","guid":"ibcsSeries4168E0C8777C41E3A2D1AAA6638B5D25","visualClassName":"Visual","version":"1.0.0.2","description":"IBCS stacked columns, stacked bars, lines, areas and dot plots","supportUrl":"https://learn.microsoft.com/power-bi/developer/visuals/","gitHubUrl":""},
+		"metadata": {
+			"pbivizjson": {
+				"resourceId": "rId0"
+			}
+		}
+	}

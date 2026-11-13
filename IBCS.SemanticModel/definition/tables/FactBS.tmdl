@@ -1,0 +1,56 @@
+/// Month-end balances per legal entity. Not additive over time - use the Balance measures.
+table FactBS
+	lineageTag: 02e39b78-f88e-5c40-9c25-49c420daabc9
+
+	column Date
+		dataType: dateTime
+		isHidden
+		formatString: dd mmm yyyy
+		lineageTag: f66a828b-b7de-5c96-8def-b66fe6ab6f20
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column BSAccountKey
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 94a5cff4-a8bc-5e29-a1dd-06bef626ab3f
+		summarizeBy: none
+		sourceColumn: BSAccountKey
+
+	column RegionKey
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 068eda97-7c86-5c49-931c-29726edecbc8
+		summarizeBy: none
+		sourceColumn: RegionKey
+
+	column Scenario
+		dataType: string
+		lineageTag: f643550f-1702-506c-ab38-c5a92b4f028f
+		summarizeBy: none
+		sourceColumn: Scenario
+
+	column Balance
+		dataType: double
+		isHidden
+		formatString: #,0
+		lineageTag: 60a35c6e-5445-59a6-ab6e-9137b3b69d77
+		summarizeBy: none
+		sourceColumn: Balance
+
+	partition FactBS = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "FactBS.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"Date", type date}, {"BSAccountKey", Int64.Type}, {"RegionKey", Int64.Type}, {"Scenario", type text}, {"Balance", type number}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,17 @@
+{
+		"version": "1.0.0.3",
+		"author": {"name":"Faizaan","email":"Contact@faizaan.me"},
+		"resources": [
+			{
+				"resourceId": "rId0",
+				"sourceType": 5,
+				"file": "resources/ibcsMultiplesB9599ECA142C47BCA9DEA2F6B38565CD.pbiviz.json"
+			}
+		],
+		"visual": {"name":"ibcsMultiples","displayName":"IBCS Small Multiples","guid":"ibcsMultiplesB9599ECA142C47BCA9DEA2F6B38565CD","visualClassName":"Visual","version":"1.0.0.3","description":"IBCS small multiples on one shared scale","supportUrl":"https://learn.microsoft.com/power-bi/developer/visuals/","gitHubUrl":""},
+		"metadata": {
+			"pbivizjson": {
+				"resourceId": "rId0"
+			}
+		}
+	}

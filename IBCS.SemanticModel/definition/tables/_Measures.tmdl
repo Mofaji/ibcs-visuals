@@ -1,0 +1,1366 @@
+/// Business measures. AC/PM follow the View and Compare toggles.
+table _Measures
+	lineageTag: c2b2e538-9205-54b0-850c-34ad7bf9a297
+
+	/// Last day of the last month whose actuals are closed.
+	measure 'Last Closed Date' = CALCULATE(MAX('Calendar'[Date]), REMOVEFILTERS('Calendar'), 'Calendar'[Period Status] = "Closed")
+		formatString: dd mmm yyyy
+		displayFolder: Context
+		lineageTag: 9724cca6-9468-5bf7-8c40-bcb13983f877
+
+	/// End of the reporting window: the latest date in the Year/Month selection, capped at the last closed month.
+	measure 'As Of Date' =
+			VAR _max = MAX('Calendar'[Date])
+			VAR _last = [Last Closed Date]
+			RETURN IF(ISBLANK(_max), _last, MIN(_max, _last))
+		formatString: dd mmm yyyy
+		displayFolder: Context
+		lineageTag: e4d3c4e7-40f6-596a-ab15-11cbce7e4c3f
+
+	/// Reporting window chosen with the View toggle: YTD, QTD or MTD (default YTD).
+	measure 'Selected View' = SELECTEDVALUE('ViewSelector'[View], "YTD")
+		displayFolder: Context
+		lineageTag: 5e4a0273-1103-5ed8-bbb3-e092adcd8a70
+
+	/// Comparison scenario chosen with the Compare toggle: Budget, Prior Year or Forecast (default Budget).
+	measure 'Selected Comparison' = SELECTEDVALUE('ComparisonSelector'[Comparison], "Budget")
+		displayFolder: Context
+		lineageTag: 5e11dbe5-7b06-5c7d-af21-895346a476cb
+
+	/// IBCS scenario code of the comparison (BU, PY, FC); feeds the column headers of the IBCS visuals.
+	measure 'Comparison Code' = SWITCH([Selected Comparison], "Prior Year", "PY", "Forecast", "FC", "BU")
+		displayFolder: Context
+		lineageTag: ee81b514-2dad-5e02-be0d-4f5006d9eafa
+
+	/// Comparison as text, e.g. 'vs Budget'.
+	measure 'Comparison Label' = "vs " & [Selected Comparison]
+		displayFolder: Context
+		lineageTag: b3a5efe2-b14b-5137-bb65-9e8e40e84ead
+
+	/// First day of the reporting window for the selected View.
+	measure 'Period Start' =
+			VAR _asof = [As Of Date]
+			RETURN
+			    SWITCH([Selected View],
+			        "MTD", DATE(YEAR(_asof), MONTH(_asof), 1),
+			        "QTD", DATE(YEAR(_asof), (ROUNDUP(MONTH(_asof) / 3, 0) - 1) * 3 + 1, 1),
+			        DATE(YEAR(_asof), 1, 1))
+		formatString: dd mmm yyyy
+		displayFolder: Context
+		lineageTag: 949d198c-c131-5343-8218-20a73b6418c7
+
+	/// Number of months in the reporting window.
+	measure 'Months In Period' = DATEDIFF([Period Start], [As Of Date], MONTH) + 1
+		formatString: 0
+		displayFolder: Context
+		lineageTag: 36159443-3b9a-54fc-9f04-db84a533b0ab
+
+	/// Reporting window as text, e.g. 'YTD Sep 2026'.
+	measure 'Period Label' = [Selected View] & " " & FORMAT([As Of Date], "mmm yyyy")
+		displayFolder: Context
+		lineageTag: e6371fe0-f89d-538f-8bc9-7e0e914ef038
+
+	/// Actual P&L amount in the current filter context, no time window. Revenue positive, costs negative.
+	measure 'Actual Amount' = CALCULATE(SUM(FactPL[Amount]), FactPL[Scenario] = "Actual")
+		formatString: #,0
+		displayFolder: P&L\Base
+		lineageTag: 53b8727a-33f7-5e69-809c-e2eafa97bcb5
+
+	/// Budget P&L amount in the current filter context, no time window. Revenue positive, costs negative.
+	measure 'Budget Amount' = CALCULATE(SUM(FactPL[Amount]), FactPL[Scenario] = "Budget")
+		formatString: #,0
+		displayFolder: P&L\Base
+		lineageTag: 92cb95f1-004d-5de7-b80f-cb0a8cdc3820
+
+	/// Forecast P&L amount in the current filter context, no time window. Revenue positive, costs negative.
+	measure 'Forecast Amount' = CALCULATE(SUM(FactPL[Amount]), FactPL[Scenario] = "Forecast")
+		formatString: #,0
+		displayFolder: P&L\Base
+		lineageTag: e4cfc6e7-2dfa-5c62-bc42-8be5847cdfdc
+
+	/// Actual P&L amount for the same period one year earlier.
+	measure 'Prior Year Amount' = CALCULATE([Actual Amount], SAMEPERIODLASTYEAR('Calendar'[Date]))
+		formatString: #,0
+		displayFolder: P&L\Base
+		lineageTag: 045cd441-d200-5b06-95db-41db4f9cc06d
+
+	/// P&L amount of the comparison scenario chosen with the Compare toggle, no time window. For monthly charts.
+	measure 'Comparison Amount' = SWITCH([Selected Comparison], "Prior Year", [Prior Year Amount], "Forecast", [Forecast Amount], [Budget Amount])
+		formatString: #,0
+		displayFolder: P&L\Base
+		lineageTag: 2bb7cd95-5ce7-54a3-844c-1f4d8f2f6280
+
+	/// Actual P&L amount for the reporting window (View toggle, ending at the as-of month).
+	measure 'Amount AC' =
+			VAR _end = [As Of Date]
+			VAR _start = [Period Start]
+			RETURN CALCULATE([Actual Amount], FILTER(ALL('Calendar'), 'Calendar'[Date] >= _start && 'Calendar'[Date] <= _end))
+		formatString: #,0
+		displayFolder: P&L
+		lineageTag: a832041c-7129-5488-826c-843f5352849b
+
+	/// Budget for the reporting window.
+	measure 'Amount BU' =
+			VAR _end = [As Of Date]
+			VAR _start = [Period Start]
+			RETURN CALCULATE([Budget Amount], FILTER(ALL('Calendar'), 'Calendar'[Date] >= _start && 'Calendar'[Date] <= _end))
+		formatString: #,0
+		displayFolder: P&L
+		lineageTag: 44c2a6c2-9466-57af-b9f5-d4b8fad5a310
+
+	/// 6+6 forecast for the reporting window (Jan-Jun actual, Jul-Dec forecast).
+	measure 'Amount FC' =
+			VAR _end = [As Of Date]
+			VAR _start = [Period Start]
+			RETURN CALCULATE([Forecast Amount], FILTER(ALL('Calendar'), 'Calendar'[Date] >= _start && 'Calendar'[Date] <= _end))
+		formatString: #,0
+		displayFolder: P&L
+		lineageTag: 22b0fc41-3326-55bc-b6c3-26cda466057f
+
+	/// Actual for the same window one year earlier.
+	measure 'Amount PY' =
+			VAR _end = [As Of Date]
+			VAR _start = [Period Start]
+			RETURN CALCULATE([Actual Amount], FILTER(ALL('Calendar'), 'Calendar'[Date] >= EDATE(_start, -12) && 'Calendar'[Date] <= EDATE(_end, -12)))
+		formatString: #,0
+		displayFolder: P&L
+		lineageTag: adb107ce-55df-5f84-a41f-4c19ae9c3980
+
+	/// Actual for the same window two years earlier (prior-year growth).
+	measure 'Amount PY2' =
+			VAR _end = [As Of Date]
+			VAR _start = [Period Start]
+			RETURN CALCULATE([Actual Amount], FILTER(ALL('Calendar'), 'Calendar'[Date] >= EDATE(_start, -24) && 'Calendar'[Date] <= EDATE(_end, -24)))
+		formatString: #,0
+		displayFolder: P&L
+		lineageTag: ebbade32-d698-59cb-bfbe-ddf4641139cc
+
+	/// Comparison amount for the reporting window, following the Compare toggle.
+	measure 'Amount PM' = SWITCH([Selected Comparison], "Prior Year", [Amount PY], "Forecast", [Amount FC], [Amount BU])
+		formatString: #,0
+		displayFolder: P&L
+		lineageTag: 0b07c9b0-1170-5c04-9be2-2880b70f9f45
+
+	/// Actual minus comparison for the reporting window. Positive is favourable because costs are negative.
+	measure 'Amount Variance' = IF(ISBLANK([Amount AC]) || ISBLANK([Amount PM]), BLANK(), [Amount AC] - [Amount PM])
+		formatString: #,0
+		displayFolder: P&L
+		lineageTag: 2c778012-af21-55d9-a32f-fbe1b44a2765
+
+	/// Relative variance of actual against the comparison.
+	measure 'Amount Variance %' = DIVIDE([Amount AC] - [Amount PM], ABS([Amount PM]))
+		formatString: 0.0%
+		displayFolder: P&L
+		lineageTag: ab3ebd37-afe5-53fa-80f7-fcb4febca049
+
+	/// Net Revenue, actual value for the reporting window (signed: costs negative).
+	measure 'Net Revenue AC' = CALCULATE([Amount AC], KEEPFILTERS('Account'[Account Class] IN {"Revenue"}))
+		formatString: #,0
+		displayFolder: P&L\Lines
+		lineageTag: 8b5e13bf-065a-5f4c-be3b-eee11dd17fea
+
+	/// Net Revenue, comparison value for the reporting window (signed: costs negative).
+	measure 'Net Revenue PM' = CALCULATE([Amount PM], KEEPFILTERS('Account'[Account Class] IN {"Revenue"}))
+		formatString: #,0
+		displayFolder: P&L\Lines
+		lineageTag: 4506e6a1-4629-5b69-9de2-f4963e4cfd76
+
+	/// Net Revenue, prior-year value for the reporting window (signed: costs negative).
+	measure 'Net Revenue PY' = CALCULATE([Amount PY], KEEPFILTERS('Account'[Account Class] IN {"Revenue"}))
+		formatString: #,0
+		displayFolder: P&L\Lines
+		lineageTag: e1036546-2dfa-5b75-93b4-12a1dd8b5004
+
+	/// Net Revenue, budget value for the reporting window (signed: costs negative).
+	measure 'Net Revenue BU' = CALCULATE([Amount BU], KEEPFILTERS('Account'[Account Class] IN {"Revenue"}))
+		formatString: #,0
+		displayFolder: P&L\Lines
+		lineageTag: 00c049f1-c562-5838-859e-5fb2e0dd97ea
+
+	/// Net Revenue, forecast value for the reporting window (signed: costs negative).
+	measure 'Net Revenue FC' = CALCULATE([Amount FC], KEEPFILTERS('Account'[Account Class] IN {"Revenue"}))
+		formatString: #,0
+		displayFolder: P&L\Lines
+		lineageTag: 136deee2-6efe-505b-bc6d-c36096847dd6
+
+	/// Net Revenue, two-years-earlier value for the reporting window (signed: costs negative).
+	measure 'Net Revenue PY2' = CALCULATE([Amount PY2], KEEPFILTERS('Account'[Account Class] IN {"Revenue"}))
+		formatString: #,0
+		displayFolder: P&L\Lines
+		lineageTag: bb49c7db-3f82-5e8e-a59a-3934ae47dac8
+
+	/// Net Revenue, actual value in the current month context (for month-axis charts).
+	measure 'Net Revenue Monthly AC' = CALCULATE([Actual Amount], KEEPFILTERS('Account'[Account Class] IN {"Revenue"}))
+		formatString: #,0
+		displayFolder: P&L\Monthly
+		lineageTag: 62a9a8f7-280b-5655-abbf-58cb941d10b9
+
+	/// Net Revenue, comparison value in the current month context (for month-axis charts).
+	measure 'Net Revenue Monthly PM' = CALCULATE([Comparison Amount], KEEPFILTERS('Account'[Account Class] IN {"Revenue"}))
+		formatString: #,0
+		displayFolder: P&L\Monthly
+		lineageTag: f20553f4-9a20-53f2-995b-7a5eedddb516
+
+	/// Cost of Sales, actual value for the reporting window (signed: costs negative).
+	measure 'Cost of Sales AC' = CALCULATE([Amount AC], KEEPFILTERS('Account'[Account Class] IN {"Cost of Sales"}))
+		formatString: #,0
+		displayFolder: P&L\Lines
+		lineageTag: 8665eea4-07a5-5044-acdc-446b854c0866
+
+	/// Cost of Sales, comparison value for the reporting window (signed: costs negative).
+	measure 'Cost of Sales PM' = CALCULATE([Amount PM], KEEPFILTERS('Account'[Account Class] IN {"Cost of Sales"}))
+		formatString: #,0
+		displayFolder: P&L\Lines
+		lineageTag: 08dad8e6-ce5b-58ac-8052-3fd2576a03d8
+
+	/// Cost of Sales, prior-year value for the reporting window (signed: costs negative).
+	measure 'Cost of Sales PY' = CALCULATE([Amount PY], KEEPFILTERS('Account'[Account Class] IN {"Cost of Sales"}))
+		formatString: #,0
+		displayFolder: P&L\Lines
+		lineageTag: b35d34ca-e0bc-59f4-9758-def643ec5407
+
+	/// Gross Profit, actual value for the reporting window (signed: costs negative).
+	measure 'Gross Profit AC' = CALCULATE([Amount AC], KEEPFILTERS('Account'[Account Class] IN {"Revenue", "Cost of Sales"}))
+		formatString: #,0
+		displayFolder: P&L\Lines
+		lineageTag: 6c985981-555a-5fe6-b545-27b71336cd66
+
+	/// Gross Profit, comparison value for the reporting window (signed: costs negative).
+	measure 'Gross Profit PM' = CALCULATE([Amount PM], KEEPFILTERS('Account'[Account Class] IN {"Revenue", "Cost of Sales"}))
+		formatString: #,0
+		displayFolder: P&L\Lines
+		lineageTag: cc4ac4e4-0812-5ab2-9efe-bc00028cd69d
+
+	/// Gross Profit, prior-year value for the reporting window (signed: costs negative).
+	measure 'Gross Profit PY' = CALCULATE([Amount PY], KEEPFILTERS('Account'[Account Class] IN {"Revenue", "Cost of Sales"}))
+		formatString: #,0
+		displayFolder: P&L\Lines
+		lineageTag: 8a588c2a-f3e6-513a-b739-e03510268589
+
+	/// Gross Profit, actual value in the current month context (for month-axis charts).
+	measure 'Gross Profit Monthly AC' = CALCULATE([Actual Amount], KEEPFILTERS('Account'[Account Class] IN {"Revenue", "Cost of Sales"}))
+		formatString: #,0
+		displayFolder: P&L\Monthly
+		lineageTag: dcde1f7f-ec72-5b1f-ba7a-e8fdd092abd3
+
+	/// Gross Profit, comparison value in the current month context (for month-axis charts).
+	measure 'Gross Profit Monthly PM' = CALCULATE([Comparison Amount], KEEPFILTERS('Account'[Account Class] IN {"Revenue", "Cost of Sales"}))
+		formatString: #,0
+		displayFolder: P&L\Monthly
+		lineageTag: 8724d84b-55c4-55fa-aa12-f9b5bce623b0
+
+	/// Operating Expenses, actual value for the reporting window (signed: costs negative).
+	measure 'Operating Expenses AC' = CALCULATE([Amount AC], KEEPFILTERS('Account'[Account Class] IN {"Operating Expenses"}))
+		formatString: #,0
+		displayFolder: P&L\Lines
+		lineageTag: bf0e7d7e-a39c-533c-b0e2-e2544c547ae5
+
+	/// Operating Expenses, comparison value for the reporting window (signed: costs negative).
+	measure 'Operating Expenses PM' = CALCULATE([Amount PM], KEEPFILTERS('Account'[Account Class] IN {"Operating Expenses"}))
+		formatString: #,0
+		displayFolder: P&L\Lines
+		lineageTag: fd024c80-477d-5e02-96e4-aeb6b0a0027e
+
+	/// Operating Expenses, prior-year value for the reporting window (signed: costs negative).
+	measure 'Operating Expenses PY' = CALCULATE([Amount PY], KEEPFILTERS('Account'[Account Class] IN {"Operating Expenses"}))
+		formatString: #,0
+		displayFolder: P&L\Lines
+		lineageTag: c70c1317-f9a7-510d-9105-748df3440502
+
+	/// EBITDA, actual value for the reporting window (signed: costs negative).
+	measure 'EBITDA AC' = CALCULATE([Amount AC], KEEPFILTERS('Account'[Account Class] IN {"Revenue", "Cost of Sales", "Operating Expenses"}))
+		formatString: #,0
+		displayFolder: P&L\Lines
+		lineageTag: 9b01d9ff-f68b-560f-a296-eaa826421380
+
+	/// EBITDA, comparison value for the reporting window (signed: costs negative).
+	measure 'EBITDA PM' = CALCULATE([Amount PM], KEEPFILTERS('Account'[Account Class] IN {"Revenue", "Cost of Sales", "Operating Expenses"}))
+		formatString: #,0
+		displayFolder: P&L\Lines
+		lineageTag: e0e0779c-5121-57fc-8cf9-d7e5e519d421
+
+	/// EBITDA, prior-year value for the reporting window (signed: costs negative).
+	measure 'EBITDA PY' = CALCULATE([Amount PY], KEEPFILTERS('Account'[Account Class] IN {"Revenue", "Cost of Sales", "Operating Expenses"}))
+		formatString: #,0
+		displayFolder: P&L\Lines
+		lineageTag: 24205f67-935c-50af-9e25-6dceb53dc6e6
+
+	/// EBITDA, actual value in the current month context (for month-axis charts).
+	measure 'EBITDA Monthly AC' = CALCULATE([Actual Amount], KEEPFILTERS('Account'[Account Class] IN {"Revenue", "Cost of Sales", "Operating Expenses"}))
+		formatString: #,0
+		displayFolder: P&L\Monthly
+		lineageTag: 83576f7a-2d5a-5639-b589-9a3d385a8e2f
+
+	/// EBITDA, comparison value in the current month context (for month-axis charts).
+	measure 'EBITDA Monthly PM' = CALCULATE([Comparison Amount], KEEPFILTERS('Account'[Account Class] IN {"Revenue", "Cost of Sales", "Operating Expenses"}))
+		formatString: #,0
+		displayFolder: P&L\Monthly
+		lineageTag: aa0d6564-50b3-5a2f-9bab-433a4428de09
+
+	/// D&A, actual value for the reporting window (signed: costs negative).
+	measure 'D&A AC' = CALCULATE([Amount AC], KEEPFILTERS('Account'[Account Class] IN {"Depreciation & Amortization"}))
+		formatString: #,0
+		displayFolder: P&L\Lines
+		lineageTag: 33324f61-3c52-57b6-848e-65bbd3be334e
+
+	/// D&A, comparison value for the reporting window (signed: costs negative).
+	measure 'D&A PM' = CALCULATE([Amount PM], KEEPFILTERS('Account'[Account Class] IN {"Depreciation & Amortization"}))
+		formatString: #,0
+		displayFolder: P&L\Lines
+		lineageTag: 3524d6c3-8d20-59a4-b7f4-5d861c2b3015
+
+	/// D&A, prior-year value for the reporting window (signed: costs negative).
+	measure 'D&A PY' = CALCULATE([Amount PY], KEEPFILTERS('Account'[Account Class] IN {"Depreciation & Amortization"}))
+		formatString: #,0
+		displayFolder: P&L\Lines
+		lineageTag: e12c553b-b1a1-53bf-a192-8f265aa6ed91
+
+	/// EBIT, actual value for the reporting window (signed: costs negative).
+	measure 'EBIT AC' = CALCULATE([Amount AC], KEEPFILTERS('Account'[Account Class] IN {"Revenue", "Cost of Sales", "Operating Expenses", "Depreciation & Amortization"}))
+		formatString: #,0
+		displayFolder: P&L\Lines
+		lineageTag: 77aa7148-5942-55b8-8f8b-43f6c923ede3
+
+	/// EBIT, comparison value for the reporting window (signed: costs negative).
+	measure 'EBIT PM' = CALCULATE([Amount PM], KEEPFILTERS('Account'[Account Class] IN {"Revenue", "Cost of Sales", "Operating Expenses", "Depreciation & Amortization"}))
+		formatString: #,0
+		displayFolder: P&L\Lines
+		lineageTag: 6b2b0103-0067-5dee-816d-2db4504c7321
+
+	/// EBIT, prior-year value for the reporting window (signed: costs negative).
+	measure 'EBIT PY' = CALCULATE([Amount PY], KEEPFILTERS('Account'[Account Class] IN {"Revenue", "Cost of Sales", "Operating Expenses", "Depreciation & Amortization"}))
+		formatString: #,0
+		displayFolder: P&L\Lines
+		lineageTag: e831d844-40e0-5687-9b57-274c44422171
+
+	/// Financial Result, actual value for the reporting window (signed: costs negative).
+	measure 'Financial Result AC' = CALCULATE([Amount AC], KEEPFILTERS('Account'[Account Class] IN {"Financial Result"}))
+		formatString: #,0
+		displayFolder: P&L\Lines
+		lineageTag: ed768ba9-f745-5250-89ed-6460a5c300fc
+
+	/// Financial Result, comparison value for the reporting window (signed: costs negative).
+	measure 'Financial Result PM' = CALCULATE([Amount PM], KEEPFILTERS('Account'[Account Class] IN {"Financial Result"}))
+		formatString: #,0
+		displayFolder: P&L\Lines
+		lineageTag: b61d5fc3-ba52-589c-a9be-77efc6b09112
+
+	/// Financial Result, prior-year value for the reporting window (signed: costs negative).
+	measure 'Financial Result PY' = CALCULATE([Amount PY], KEEPFILTERS('Account'[Account Class] IN {"Financial Result"}))
+		formatString: #,0
+		displayFolder: P&L\Lines
+		lineageTag: e440bd35-ac85-5a13-9975-6a0a32dc319b
+
+	/// Profit Before Tax, actual value for the reporting window (signed: costs negative).
+	measure 'Profit Before Tax AC' = CALCULATE([Amount AC], KEEPFILTERS('Account'[Account Class] IN {"Revenue", "Cost of Sales", "Operating Expenses", "Depreciation & Amortization", "Financial Result"}))
+		formatString: #,0
+		displayFolder: P&L\Lines
+		lineageTag: b16b8cb1-85c5-52db-bb61-2e8bd73878c3
+
+	/// Profit Before Tax, comparison value for the reporting window (signed: costs negative).
+	measure 'Profit Before Tax PM' = CALCULATE([Amount PM], KEEPFILTERS('Account'[Account Class] IN {"Revenue", "Cost of Sales", "Operating Expenses", "Depreciation & Amortization", "Financial Result"}))
+		formatString: #,0
+		displayFolder: P&L\Lines
+		lineageTag: efeeac6e-45ed-56e8-a25b-6553fbe48148
+
+	/// Profit Before Tax, prior-year value for the reporting window (signed: costs negative).
+	measure 'Profit Before Tax PY' = CALCULATE([Amount PY], KEEPFILTERS('Account'[Account Class] IN {"Revenue", "Cost of Sales", "Operating Expenses", "Depreciation & Amortization", "Financial Result"}))
+		formatString: #,0
+		displayFolder: P&L\Lines
+		lineageTag: 75fbac9f-015e-5cbe-aff9-1c14294523e8
+
+	/// Income Tax, actual value for the reporting window (signed: costs negative).
+	measure 'Income Tax AC' = CALCULATE([Amount AC], KEEPFILTERS('Account'[Account Class] IN {"Income Tax"}))
+		formatString: #,0
+		displayFolder: P&L\Lines
+		lineageTag: e7a8d845-e409-5b3d-aa52-6a401d7ac399
+
+	/// Income Tax, comparison value for the reporting window (signed: costs negative).
+	measure 'Income Tax PM' = CALCULATE([Amount PM], KEEPFILTERS('Account'[Account Class] IN {"Income Tax"}))
+		formatString: #,0
+		displayFolder: P&L\Lines
+		lineageTag: 206d409c-1ad1-53e7-aedb-f8310319210a
+
+	/// Income Tax, prior-year value for the reporting window (signed: costs negative).
+	measure 'Income Tax PY' = CALCULATE([Amount PY], KEEPFILTERS('Account'[Account Class] IN {"Income Tax"}))
+		formatString: #,0
+		displayFolder: P&L\Lines
+		lineageTag: 991eedec-6a21-5931-93a2-9676e657d4de
+
+	/// Net Income, actual value for the reporting window (signed: costs negative).
+	measure 'Net Income AC' = CALCULATE([Amount AC], KEEPFILTERS('Account'[Account Class] IN {"Revenue", "Cost of Sales", "Operating Expenses", "Depreciation & Amortization", "Financial Result", "Income Tax"}))
+		formatString: #,0
+		displayFolder: P&L\Lines
+		lineageTag: c8fdad65-059f-504e-ae38-e443e7d2c174
+
+	/// Net Income, comparison value for the reporting window (signed: costs negative).
+	measure 'Net Income PM' = CALCULATE([Amount PM], KEEPFILTERS('Account'[Account Class] IN {"Revenue", "Cost of Sales", "Operating Expenses", "Depreciation & Amortization", "Financial Result", "Income Tax"}))
+		formatString: #,0
+		displayFolder: P&L\Lines
+		lineageTag: b12dd64e-14c5-5120-b4c8-232831fe2763
+
+	/// Net Income, prior-year value for the reporting window (signed: costs negative).
+	measure 'Net Income PY' = CALCULATE([Amount PY], KEEPFILTERS('Account'[Account Class] IN {"Revenue", "Cost of Sales", "Operating Expenses", "Depreciation & Amortization", "Financial Result", "Income Tax"}))
+		formatString: #,0
+		displayFolder: P&L\Lines
+		lineageTag: 46305ee4-07f3-5941-b705-a32d5ea576fc
+
+	/// Net Income, actual value in the current month context (for month-axis charts).
+	measure 'Net Income Monthly AC' = CALCULATE([Actual Amount], KEEPFILTERS('Account'[Account Class] IN {"Revenue", "Cost of Sales", "Operating Expenses", "Depreciation & Amortization", "Financial Result", "Income Tax"}))
+		formatString: #,0
+		displayFolder: P&L\Monthly
+		lineageTag: 623e017c-1582-5f88-ad55-59534e3c77c9
+
+	/// Net Income, comparison value in the current month context (for month-axis charts).
+	measure 'Net Income Monthly PM' = CALCULATE([Comparison Amount], KEEPFILTERS('Account'[Account Class] IN {"Revenue", "Cost of Sales", "Operating Expenses", "Depreciation & Amortization", "Financial Result", "Income Tax"}))
+		formatString: #,0
+		displayFolder: P&L\Monthly
+		lineageTag: b2653c84-1403-5fb0-84d4-3ff243ca0b07
+
+	/// Gross Profit as a share of net revenue, actual.
+	measure 'Gross Margin % AC' = DIVIDE([Gross Profit AC], [Net Revenue AC])
+		formatString: 0.0%
+		displayFolder: P&L\Margins
+		lineageTag: 58ce5dee-c87e-5158-abb0-65cc65517a85
+
+	/// Gross Profit as a share of net revenue, comparison.
+	measure 'Gross Margin % PM' = DIVIDE([Gross Profit PM], [Net Revenue PM])
+		formatString: 0.0%
+		displayFolder: P&L\Margins
+		lineageTag: c09c4750-eb2c-5561-965b-72248b5640dd
+
+	/// EBITDA as a share of net revenue, actual.
+	measure 'EBITDA Margin % AC' = DIVIDE([EBITDA AC], [Net Revenue AC])
+		formatString: 0.0%
+		displayFolder: P&L\Margins
+		lineageTag: ea5f7618-1c81-58c8-913a-937043377bee
+
+	/// EBITDA as a share of net revenue, comparison.
+	measure 'EBITDA Margin % PM' = DIVIDE([EBITDA PM], [Net Revenue PM])
+		formatString: 0.0%
+		displayFolder: P&L\Margins
+		lineageTag: d68fef01-baaf-5d62-aa2b-b8848e5345fc
+
+	/// EBIT as a share of net revenue, actual.
+	measure 'EBIT Margin % AC' = DIVIDE([EBIT AC], [Net Revenue AC])
+		formatString: 0.0%
+		displayFolder: P&L\Margins
+		lineageTag: c9f9b839-424d-54b7-aac0-dd24bda425e8
+
+	/// EBIT as a share of net revenue, comparison.
+	measure 'EBIT Margin % PM' = DIVIDE([EBIT PM], [Net Revenue PM])
+		formatString: 0.0%
+		displayFolder: P&L\Margins
+		lineageTag: 25fe9ddb-829d-5197-8f5a-8fdbd76fc1a6
+
+	/// Net Income as a share of net revenue, actual.
+	measure 'Net Margin % AC' = DIVIDE([Net Income AC], [Net Revenue AC])
+		formatString: 0.0%
+		displayFolder: P&L\Margins
+		lineageTag: 1a0186c0-2343-5614-bfe6-3a43efa9e9cf
+
+	/// Net Income as a share of net revenue, comparison.
+	measure 'Net Margin % PM' = DIVIDE([Net Income PM], [Net Revenue PM])
+		formatString: 0.0%
+		displayFolder: P&L\Margins
+		lineageTag: a3a08dde-3cab-53ca-a467-aa4bbc0bb994
+
+	/// EBITDA margin in the current month context, actual.
+	measure 'EBITDA Margin % Monthly AC' = DIVIDE([EBITDA Monthly AC], [Net Revenue Monthly AC])
+		formatString: 0.0%
+		displayFolder: P&L\Monthly
+		lineageTag: f819c0ed-b47b-598e-8a07-78168a272ef5
+
+	/// Operating expenses as a positive amount, actual.
+	measure 'OPEX AC' = -[Operating Expenses AC]
+		formatString: #,0
+		displayFolder: Expenses
+		lineageTag: ca6bc16b-d1bd-5fb4-93f8-e658d55a3d3e
+
+	/// Cost of sales as a positive amount, actual.
+	measure 'COGS AC' = -[Cost of Sales AC]
+		formatString: #,0
+		displayFolder: Expenses
+		lineageTag: fd5cd8a7-3bb2-5108-8458-5b8effe75745
+
+	/// Operating expenses as a share of net revenue, actual.
+	measure 'OPEX % of Revenue AC' = DIVIDE([OPEX AC], [Net Revenue AC])
+		formatString: 0.0%
+		displayFolder: Expenses
+		lineageTag: dc6fd72d-7e6d-5033-8a40-dcfe78f81275
+
+	/// Salaries and benefits in operating expenses (positive), actual.
+	measure 'Personnel Cost AC' = -CALCULATE([Amount AC], KEEPFILTERS('Account'[Account] = "Salaries & Benefits"))
+		formatString: #,0
+		displayFolder: Expenses
+		lineageTag: ec41fa93-f636-5a4e-a77a-ea507ad416ae
+
+	/// Operating expenses (positive) in the current month context, actual.
+	measure 'OPEX Monthly AC' = -CALCULATE([Actual Amount], KEEPFILTERS('Account'[Account Class] = "Operating Expenses"))
+		formatString: #,0
+		displayFolder: Expenses
+		lineageTag: 560c9ac5-69e8-5f4f-98c4-6c723c4939db
+
+	/// Recurring subscription revenue, actual.
+	measure 'Subscription Revenue AC' = CALCULATE([Amount AC], KEEPFILTERS('Account'[Account] = "Subscription Revenue"))
+		formatString: #,0
+		displayFolder: Revenue
+		lineageTag: 2ebef4aa-6805-51c9-a269-c1f9b1a98351
+
+	/// Subscription revenue as a share of net revenue, actual.
+	measure 'Subscription Share % AC' = DIVIDE([Subscription Revenue AC], [Net Revenue AC])
+		formatString: 0.0%
+		displayFolder: Revenue
+		lineageTag: 532ce4e7-6ea5-5b93-bf0c-3b3ebfadd875
+
+	/// Discounts and returns as a positive amount, actual.
+	measure 'Discounts AC' = -CALCULATE([Amount AC], KEEPFILTERS('Account'[Account] = "Discounts & Returns"))
+		formatString: #,0
+		displayFolder: Revenue
+		lineageTag: a9f633f7-937d-5f56-9573-cf697877bad2
+
+	/// Discounts and returns as a share of gross revenue, actual.
+	measure 'Discount Rate % AC' = DIVIDE([Discounts AC], [Net Revenue AC] + [Discounts AC])
+		formatString: 0.0%
+		displayFolder: Revenue
+		lineageTag: 88c983f9-a9e5-55c0-998a-302374b409a5
+
+	/// EBITDA margin in the current month context, comparison.
+	measure 'EBITDA Margin % Monthly PM' = DIVIDE([EBITDA Monthly PM], [Net Revenue Monthly PM])
+		formatString: 0.0%
+		displayFolder: P&L\Monthly
+		lineageTag: db929ed6-fe89-59bd-82d6-8f917d276f49
+
+	/// Operating expenses as a positive amount, comparison.
+	measure 'OPEX PM' = -[Operating Expenses PM]
+		formatString: #,0
+		displayFolder: Expenses
+		lineageTag: 395e7907-9c90-568a-94b9-6d6d3f734249
+
+	/// Cost of sales as a positive amount, comparison.
+	measure 'COGS PM' = -[Cost of Sales PM]
+		formatString: #,0
+		displayFolder: Expenses
+		lineageTag: 1c2f99bf-5663-55ad-b070-c9c5be87d6b8
+
+	/// Operating expenses as a share of net revenue, comparison.
+	measure 'OPEX % of Revenue PM' = DIVIDE([OPEX PM], [Net Revenue PM])
+		formatString: 0.0%
+		displayFolder: Expenses
+		lineageTag: bd54cfbc-1a3b-5e4b-b534-7b1e8a917915
+
+	/// Salaries and benefits in operating expenses (positive), comparison.
+	measure 'Personnel Cost PM' = -CALCULATE([Amount PM], KEEPFILTERS('Account'[Account] = "Salaries & Benefits"))
+		formatString: #,0
+		displayFolder: Expenses
+		lineageTag: 08187c0d-d6a5-598e-80e9-cddd06088f2c
+
+	/// Operating expenses (positive) in the current month context, comparison.
+	measure 'OPEX Monthly PM' = -CALCULATE([Comparison Amount], KEEPFILTERS('Account'[Account Class] = "Operating Expenses"))
+		formatString: #,0
+		displayFolder: Expenses
+		lineageTag: cb02be55-d0ad-5de0-b70d-5a514471d99b
+
+	/// Recurring subscription revenue, comparison.
+	measure 'Subscription Revenue PM' = CALCULATE([Amount PM], KEEPFILTERS('Account'[Account] = "Subscription Revenue"))
+		formatString: #,0
+		displayFolder: Revenue
+		lineageTag: d1a5ad32-81e0-5987-95a8-1f910a0fa779
+
+	/// Subscription revenue as a share of net revenue, comparison.
+	measure 'Subscription Share % PM' = DIVIDE([Subscription Revenue PM], [Net Revenue PM])
+		formatString: 0.0%
+		displayFolder: Revenue
+		lineageTag: cc9be21a-8942-5059-9c7b-66dd54b40976
+
+	/// Discounts and returns as a positive amount, comparison.
+	measure 'Discounts PM' = -CALCULATE([Amount PM], KEEPFILTERS('Account'[Account] = "Discounts & Returns"))
+		formatString: #,0
+		displayFolder: Revenue
+		lineageTag: 3a2b7975-025e-5869-a362-28481b44f535
+
+	/// Discounts and returns as a share of gross revenue, comparison.
+	measure 'Discount Rate % PM' = DIVIDE([Discounts PM], [Net Revenue PM] + [Discounts PM])
+		formatString: 0.0%
+		displayFolder: Revenue
+		lineageTag: 1ad04cc9-d138-551f-af18-91e24eef2460
+
+	/// Actual net revenue growth against the same window one year earlier.
+	measure 'Revenue Growth % AC' = DIVIDE([Net Revenue AC] - [Net Revenue PY], ABS([Net Revenue PY]))
+		formatString: 0.0%
+		displayFolder: Revenue
+		lineageTag: ee1cac6d-864b-5da0-b166-cc0d31a4acb6
+
+	/// Growth implied by the comparison scenario (budget or forecast growth, or last year's growth).
+	measure 'Revenue Growth % PM' =
+			VAR _py = [Net Revenue PY]
+			RETURN
+			    SWITCH([Selected Comparison], "Prior Year", DIVIDE(_py - [Net Revenue PY2], ABS([Net Revenue PY2])), "Forecast", DIVIDE([Net Revenue FC] - _py, ABS(_py)), DIVIDE([Net Revenue BU] - _py, ABS(_py)))
+		formatString: 0.0%
+		displayFolder: Revenue
+		lineageTag: c5022e90-7c78-54f4-9b6a-87a9811a26c9
+
+	/// Actual net revenue in USD thousands, for native visuals labelled 'USD K'.
+	measure 'Net Revenue (USD K)' = DIVIDE([Net Revenue AC], 1000)
+		formatString: #,0
+		displayFolder: Revenue
+		lineageTag: 171fc60c-49b1-5d90-8b0e-8086dbae4d54
+
+	/// Actual full-time equivalents at the end of the as-of month.
+	measure 'FTE AC' =
+			VAR _asof = [As Of Date]
+			VAR _m = DATE(YEAR(_asof), MONTH(_asof), 1)
+			RETURN CALCULATE(SUM(FactHeadcount[FTE]), FactHeadcount[Scenario] = "Actual", FILTER(ALL('Calendar'), 'Calendar'[Date] = _m))
+		formatString: #,0
+		displayFolder: Expenses
+		lineageTag: 430755ff-9d7c-572e-a7ac-4f90f73e89b4
+
+	/// Comparison FTE: prior year same month, else budget (no forecast headcount is planned).
+	measure 'FTE PM' =
+			VAR _asof = [As Of Date]
+			VAR _m = DATE(YEAR(_asof), MONTH(_asof), 1)
+			RETURN
+			    IF([Selected Comparison] = "Prior Year",
+			        CALCULATE(SUM(FactHeadcount[FTE]), FactHeadcount[Scenario] = "Actual", FILTER(ALL('Calendar'), 'Calendar'[Date] = EDATE(_m, -12))),
+			        CALCULATE(SUM(FactHeadcount[FTE]), FactHeadcount[Scenario] = "Budget", FILTER(ALL('Calendar'), 'Calendar'[Date] = _m)))
+		formatString: #,0
+		displayFolder: Expenses
+		lineageTag: b6efa34d-0fb9-5be2-b053-6c456303a1ab
+
+	/// Monthly personnel cost per full-time equivalent, actual.
+	measure 'Cost per FTE AC' = DIVIDE([Personnel Cost AC], [FTE AC] * [Months In Period])
+		formatString: #,0
+		displayFolder: Expenses
+		lineageTag: 198cbcdd-3914-5a72-a561-bf036214d4e4
+
+	/// Monthly personnel cost per full-time equivalent, comparison.
+	measure 'Cost per FTE PM' = DIVIDE([Personnel Cost PM], [FTE PM] * [Months In Period])
+		formatString: #,0
+		displayFolder: Expenses
+		lineageTag: 9dc84771-c12b-5723-b5c5-1bdc85ce770e
+
+	/// Actual balance at the end of the as-of month.
+	measure 'Balance AC' =
+			VAR _asof = [As Of Date]
+			VAR _m = DATE(YEAR(_asof), MONTH(_asof), 1)
+			RETURN CALCULATE(SUM(FactBS[Balance]), FactBS[Scenario] = "Actual", FILTER(ALL('Calendar'), 'Calendar'[Date] = _m))
+		formatString: #,0
+		displayFolder: Balance Sheet
+		lineageTag: 8ca10e3a-5812-5810-a583-bda119df4dae
+
+	/// Budget balance at the end of the as-of month.
+	measure 'Balance BU' =
+			VAR _asof = [As Of Date]
+			VAR _m = DATE(YEAR(_asof), MONTH(_asof), 1)
+			RETURN CALCULATE(SUM(FactBS[Balance]), FactBS[Scenario] = "Budget", FILTER(ALL('Calendar'), 'Calendar'[Date] = _m))
+		formatString: #,0
+		displayFolder: Balance Sheet
+		lineageTag: 813879f5-acc5-5a36-803b-c2431c38f7ad
+
+	/// Forecast balance at the end of the as-of month.
+	measure 'Balance FC' =
+			VAR _asof = [As Of Date]
+			VAR _m = DATE(YEAR(_asof), MONTH(_asof), 1)
+			RETURN CALCULATE(SUM(FactBS[Balance]), FactBS[Scenario] = "Forecast", FILTER(ALL('Calendar'), 'Calendar'[Date] = _m))
+		formatString: #,0
+		displayFolder: Balance Sheet
+		lineageTag: 73990c7b-c008-5f1a-89cc-f50901b38ff2
+
+	/// Actual balance at the end of the same month one year earlier.
+	measure 'Balance PY' =
+			VAR _asof = [As Of Date]
+			VAR _m = DATE(YEAR(_asof), MONTH(_asof), 1)
+			RETURN CALCULATE(SUM(FactBS[Balance]), FactBS[Scenario] = "Actual", FILTER(ALL('Calendar'), 'Calendar'[Date] = EDATE(_m, -12)))
+		formatString: #,0
+		displayFolder: Balance Sheet
+		lineageTag: 24120101-d9f7-529c-968d-5ca5707837cf
+
+	/// Comparison balance at the as-of month, following the Compare toggle.
+	measure 'Balance PM' = SWITCH([Selected Comparison], "Prior Year", [Balance PY], "Forecast", [Balance FC], [Balance BU])
+		formatString: #,0
+		displayFolder: Balance Sheet
+		lineageTag: 5113811a-1406-5fff-b84f-f91083f8c62c
+
+	/// Actual month-end balance in the current month context (for month-axis charts only).
+	measure 'Balance Monthly AC' = CALCULATE(SUM(FactBS[Balance]), FactBS[Scenario] = "Actual")
+		formatString: #,0
+		displayFolder: Balance Sheet\Monthly
+		lineageTag: 7c1dbf2c-1da1-57a9-b309-871c38da8dd1
+
+	/// Comparison month-end balance in the current month context.
+	measure 'Balance Monthly PM' = SWITCH([Selected Comparison], "Prior Year", CALCULATE(SUM(FactBS[Balance]), FactBS[Scenario] = "Actual", SAMEPERIODLASTYEAR('Calendar'[Date])), "Forecast", CALCULATE(SUM(FactBS[Balance]), FactBS[Scenario] = "Forecast"), CALCULATE(SUM(FactBS[Balance]), FactBS[Scenario] = "Budget"))
+		formatString: #,0
+		displayFolder: Balance Sheet\Monthly
+		lineageTag: 0ba6a4a2-4165-5dcc-8665-66b65886f5a7
+
+	/// Total Assets at the end of the as-of month, actual.
+	measure 'Total Assets AC' = CALCULATE([Balance AC], KEEPFILTERS('BSAccount'[BS Level 1] = "Assets"))
+		formatString: #,0
+		displayFolder: Balance Sheet\Lines
+		lineageTag: 143c4012-50ce-5794-b54c-4a41aa77928e
+
+	/// Total Assets at the end of the as-of month, comparison.
+	measure 'Total Assets PM' = CALCULATE([Balance PM], KEEPFILTERS('BSAccount'[BS Level 1] = "Assets"))
+		formatString: #,0
+		displayFolder: Balance Sheet\Lines
+		lineageTag: 03509048-ab89-57d3-bab2-ea418799f81e
+
+	/// Total Liabilities at the end of the as-of month, actual.
+	measure 'Total Liabilities AC' = CALCULATE([Balance AC], KEEPFILTERS('BSAccount'[BS Level 1] = "Liabilities"))
+		formatString: #,0
+		displayFolder: Balance Sheet\Lines
+		lineageTag: a37c4eae-bc6e-55d0-8791-3318aa9195f1
+
+	/// Total Liabilities at the end of the as-of month, comparison.
+	measure 'Total Liabilities PM' = CALCULATE([Balance PM], KEEPFILTERS('BSAccount'[BS Level 1] = "Liabilities"))
+		formatString: #,0
+		displayFolder: Balance Sheet\Lines
+		lineageTag: d368771a-4307-511c-8864-74dd4de99acb
+
+	/// Total Equity at the end of the as-of month, actual.
+	measure 'Total Equity AC' = CALCULATE([Balance AC], KEEPFILTERS('BSAccount'[BS Level 1] = "Equity"))
+		formatString: #,0
+		displayFolder: Balance Sheet\Lines
+		lineageTag: ca884133-3b18-5de0-b90b-04b232bba82f
+
+	/// Total Equity at the end of the as-of month, comparison.
+	measure 'Total Equity PM' = CALCULATE([Balance PM], KEEPFILTERS('BSAccount'[BS Level 1] = "Equity"))
+		formatString: #,0
+		displayFolder: Balance Sheet\Lines
+		lineageTag: 3b6ab216-1b41-5d11-b9e1-879501be77ca
+
+	/// Current Assets at the end of the as-of month, actual.
+	measure 'Current Assets AC' = CALCULATE([Balance AC], KEEPFILTERS('BSAccount'[BS Level 2] = "Current Assets"))
+		formatString: #,0
+		displayFolder: Balance Sheet\Lines
+		lineageTag: 6f9ff260-950d-591b-80f6-303ef2f51a96
+
+	/// Current Assets at the end of the as-of month, comparison.
+	measure 'Current Assets PM' = CALCULATE([Balance PM], KEEPFILTERS('BSAccount'[BS Level 2] = "Current Assets"))
+		formatString: #,0
+		displayFolder: Balance Sheet\Lines
+		lineageTag: c13ab45a-11a7-586e-9845-f7ee79d36ec4
+
+	/// Current Liabilities at the end of the as-of month, actual.
+	measure 'Current Liabilities AC' = CALCULATE([Balance AC], KEEPFILTERS('BSAccount'[BS Level 2] = "Current Liabilities"))
+		formatString: #,0
+		displayFolder: Balance Sheet\Lines
+		lineageTag: fadb4169-989c-50e5-8736-7c0ab45287cb
+
+	/// Current Liabilities at the end of the as-of month, comparison.
+	measure 'Current Liabilities PM' = CALCULATE([Balance PM], KEEPFILTERS('BSAccount'[BS Level 2] = "Current Liabilities"))
+		formatString: #,0
+		displayFolder: Balance Sheet\Lines
+		lineageTag: d8160c80-9921-5f88-adcd-4ea8d1af8f66
+
+	/// Cash at the end of the as-of month, actual.
+	measure 'Cash AC' = CALCULATE([Balance AC], KEEPFILTERS('BSAccount'[BS Metric] = "CASH"))
+		formatString: #,0
+		displayFolder: Balance Sheet\Lines
+		lineageTag: c1e20a01-598b-541d-b384-7c0131c787c0
+
+	/// Cash at the end of the as-of month, comparison.
+	measure 'Cash PM' = CALCULATE([Balance PM], KEEPFILTERS('BSAccount'[BS Metric] = "CASH"))
+		formatString: #,0
+		displayFolder: Balance Sheet\Lines
+		lineageTag: 5c1ed4f1-dc90-5de0-98d8-4daf1684c051
+
+	/// Receivables at the end of the as-of month, actual.
+	measure 'Receivables AC' = CALCULATE([Balance AC], KEEPFILTERS('BSAccount'[BS Metric] = "AR"))
+		formatString: #,0
+		displayFolder: Balance Sheet\Lines
+		lineageTag: 2b206f74-ffe1-569e-8cb6-12c743bab48a
+
+	/// Receivables at the end of the as-of month, comparison.
+	measure 'Receivables PM' = CALCULATE([Balance PM], KEEPFILTERS('BSAccount'[BS Metric] = "AR"))
+		formatString: #,0
+		displayFolder: Balance Sheet\Lines
+		lineageTag: 174875de-3b2f-5cff-bc31-b8f13c4c0f19
+
+	/// Inventory at the end of the as-of month, actual.
+	measure 'Inventory AC' = CALCULATE([Balance AC], KEEPFILTERS('BSAccount'[BS Metric] = "INV"))
+		formatString: #,0
+		displayFolder: Balance Sheet\Lines
+		lineageTag: 1a5cbaff-2ffb-5b42-99cb-b85e6323447b
+
+	/// Inventory at the end of the as-of month, comparison.
+	measure 'Inventory PM' = CALCULATE([Balance PM], KEEPFILTERS('BSAccount'[BS Metric] = "INV"))
+		formatString: #,0
+		displayFolder: Balance Sheet\Lines
+		lineageTag: 04d0606b-516c-50e2-ade5-c87d4996daf8
+
+	/// Payables at the end of the as-of month, actual.
+	measure 'Payables AC' = CALCULATE([Balance AC], KEEPFILTERS('BSAccount'[BS Metric] = "AP"))
+		formatString: #,0
+		displayFolder: Balance Sheet\Lines
+		lineageTag: a629f746-67f0-597c-b16e-036ba22abef8
+
+	/// Payables at the end of the as-of month, comparison.
+	measure 'Payables PM' = CALCULATE([Balance PM], KEEPFILTERS('BSAccount'[BS Metric] = "AP"))
+		formatString: #,0
+		displayFolder: Balance Sheet\Lines
+		lineageTag: 651f437f-ecf4-591c-b891-91c753db2d07
+
+	/// Total Debt at the end of the as-of month, actual.
+	measure 'Total Debt AC' = CALCULATE([Balance AC], KEEPFILTERS('BSAccount'[BS Metric] IN {"STD", "LTD"}))
+		formatString: #,0
+		displayFolder: Balance Sheet\Lines
+		lineageTag: 1b9f2b9a-6267-5147-8a85-871fcc10721f
+
+	/// Total Debt at the end of the as-of month, comparison.
+	measure 'Total Debt PM' = CALCULATE([Balance PM], KEEPFILTERS('BSAccount'[BS Metric] IN {"STD", "LTD"}))
+		formatString: #,0
+		displayFolder: Balance Sheet\Lines
+		lineageTag: 49babd13-e825-5255-9dad-60a8468524bd
+
+	/// Cash balance in the current month context, actual.
+	measure 'Cash Monthly AC' = CALCULATE([Balance Monthly AC], KEEPFILTERS('BSAccount'[BS Metric] = "CASH"))
+		formatString: #,0
+		displayFolder: Balance Sheet\Monthly
+		lineageTag: 00f3b34a-cd51-50a2-9d78-10819e0e3b86
+
+	/// Net working capital in the current month context, actual.
+	measure 'Working Capital Monthly AC' = CALCULATE([Balance Monthly AC], KEEPFILTERS('BSAccount'[BS Level 2] = "Current Assets")) - CALCULATE([Balance Monthly AC], KEEPFILTERS('BSAccount'[BS Level 2] = "Current Liabilities"))
+		formatString: #,0
+		displayFolder: Balance Sheet\Monthly
+		lineageTag: 589ecad4-4c07-5a21-811e-13bc9eeb3c8d
+
+	/// Current assets minus current liabilities, actual.
+	measure 'Working Capital AC' = [Current Assets AC] - [Current Liabilities AC]
+		formatString: #,0
+		displayFolder: Balance Sheet\Ratios
+		lineageTag: 0d13b4e8-a004-511f-8ecb-b2addb4304a1
+
+	/// Short- and long-term debt less cash, actual. Negative means net cash.
+	measure 'Net Debt AC' = [Total Debt AC] - [Cash AC]
+		formatString: #,0
+		displayFolder: Balance Sheet\Ratios
+		lineageTag: b96ce5a9-9bac-5807-83a9-53f6aa4771be
+
+	/// Current assets over current liabilities, actual.
+	measure 'Current Ratio AC' = DIVIDE([Current Assets AC], [Current Liabilities AC])
+		formatString: 0.00
+		displayFolder: Balance Sheet\Ratios
+		lineageTag: efb7215f-09e9-5fbd-80bd-0bd56babbd0a
+
+	/// Cash plus receivables over current liabilities, actual.
+	measure 'Quick Ratio AC' = DIVIDE([Cash AC] + [Receivables AC], [Current Liabilities AC])
+		formatString: 0.00
+		displayFolder: Balance Sheet\Ratios
+		lineageTag: 7eafb0f4-a826-560e-a09f-759f6dac65fa
+
+	/// Total debt over equity, actual.
+	measure 'Debt to Equity AC' = DIVIDE([Total Debt AC], [Total Equity AC])
+		formatString: 0.00
+		displayFolder: Balance Sheet\Ratios
+		lineageTag: f13f9c84-fd5a-5ee6-9375-e08874548d0b
+
+	/// Equity as a share of total assets, actual.
+	measure 'Equity Ratio AC' = DIVIDE([Total Equity AC], [Total Assets AC])
+		formatString: 0.0%
+		displayFolder: Balance Sheet\Ratios
+		lineageTag: 9fa61d28-cf31-5052-8b72-359d455a4453
+
+	/// Cash balance in the current month context, comparison.
+	measure 'Cash Monthly PM' = CALCULATE([Balance Monthly PM], KEEPFILTERS('BSAccount'[BS Metric] = "CASH"))
+		formatString: #,0
+		displayFolder: Balance Sheet\Monthly
+		lineageTag: 6708adf4-b3c3-53c8-b5bd-9b283eec27a6
+
+	/// Net working capital in the current month context, comparison.
+	measure 'Working Capital Monthly PM' = CALCULATE([Balance Monthly PM], KEEPFILTERS('BSAccount'[BS Level 2] = "Current Assets")) - CALCULATE([Balance Monthly PM], KEEPFILTERS('BSAccount'[BS Level 2] = "Current Liabilities"))
+		formatString: #,0
+		displayFolder: Balance Sheet\Monthly
+		lineageTag: af319946-3234-5960-a93e-8d010eb39ddd
+
+	/// Current assets minus current liabilities, comparison.
+	measure 'Working Capital PM' = [Current Assets PM] - [Current Liabilities PM]
+		formatString: #,0
+		displayFolder: Balance Sheet\Ratios
+		lineageTag: 1f414763-1783-558f-b621-6dc7ddb96c3d
+
+	/// Short- and long-term debt less cash, comparison. Negative means net cash.
+	measure 'Net Debt PM' = [Total Debt PM] - [Cash PM]
+		formatString: #,0
+		displayFolder: Balance Sheet\Ratios
+		lineageTag: f6d3cfde-8663-55c1-86ba-5fd1dcf70b55
+
+	/// Current assets over current liabilities, comparison.
+	measure 'Current Ratio PM' = DIVIDE([Current Assets PM], [Current Liabilities PM])
+		formatString: 0.00
+		displayFolder: Balance Sheet\Ratios
+		lineageTag: f109b7fd-f98d-577c-8112-68129918f14a
+
+	/// Cash plus receivables over current liabilities, comparison.
+	measure 'Quick Ratio PM' = DIVIDE([Cash PM] + [Receivables PM], [Current Liabilities PM])
+		formatString: 0.00
+		displayFolder: Balance Sheet\Ratios
+		lineageTag: 8a59f2d0-d368-5d68-a95e-67d598f83d5c
+
+	/// Total debt over equity, comparison.
+	measure 'Debt to Equity PM' = DIVIDE([Total Debt PM], [Total Equity PM])
+		formatString: 0.00
+		displayFolder: Balance Sheet\Ratios
+		lineageTag: 9ba33620-d70e-50e6-a1ec-2113913a6c52
+
+	/// Equity as a share of total assets, comparison.
+	measure 'Equity Ratio PM' = DIVIDE([Total Equity PM], [Total Assets PM])
+		formatString: 0.0%
+		displayFolder: Balance Sheet\Ratios
+		lineageTag: 926df8ed-5104-56c3-a277-3695f417c681
+
+	/// Assets minus liabilities minus equity. Zero when the statements tie.
+	measure 'Balance Check' = [Total Assets AC] - [Total Liabilities AC] - [Total Equity AC]
+		formatString: #,0
+		displayFolder: Balance Sheet
+		lineageTag: 172ac9f7-e165-59c7-b8c1-36fc0ce775f1
+
+	/// Actual P&L amount for the twelve months ending at the as-of month.
+	measure 'Amount LTM AC' =
+			VAR _asof = [As Of Date]
+			VAR _m = DATE(YEAR(_asof), MONTH(_asof), 1)
+			VAR _ls = EDATE(_m, -11)
+			RETURN CALCULATE([Actual Amount], FILTER(ALL('Calendar'), 'Calendar'[Date] >= _ls && 'Calendar'[Date] <= _asof))
+		formatString: #,0
+		displayFolder: P&L\LTM
+		lineageTag: d22f6f9b-6649-5890-946b-cf0402c9eff7
+
+	/// Comparison P&L amount for the twelve months ending at the as-of month.
+	measure 'Amount LTM PM' =
+			VAR _asof = [As Of Date]
+			VAR _m = DATE(YEAR(_asof), MONTH(_asof), 1)
+			VAR _ls = EDATE(_m, -11)
+			RETURN
+			    SWITCH([Selected Comparison], "Prior Year", CALCULATE([Actual Amount], FILTER(ALL('Calendar'), 'Calendar'[Date] >= EDATE(_ls, -12) && 'Calendar'[Date] <= EDATE(_asof, -12))), "Forecast", CALCULATE([Forecast Amount], FILTER(ALL('Calendar'), 'Calendar'[Date] >= _ls && 'Calendar'[Date] <= _asof)), CALCULATE([Budget Amount], FILTER(ALL('Calendar'), 'Calendar'[Date] >= _ls && 'Calendar'[Date] <= _asof)))
+		formatString: #,0
+		displayFolder: P&L\LTM
+		lineageTag: cad61a6c-23f6-515a-8e08-53ba2dbc154e
+
+	/// Net Revenue, last twelve months, actual.
+	measure 'Net Revenue LTM AC' = CALCULATE([Amount LTM AC], KEEPFILTERS('Account'[Account Class] = "Revenue"))
+		formatString: #,0
+		displayFolder: P&L\LTM
+		lineageTag: af8c7b84-6366-5e06-832b-7b81587959b9
+
+	/// Net Revenue, last twelve months, comparison.
+	measure 'Net Revenue LTM PM' = CALCULATE([Amount LTM PM], KEEPFILTERS('Account'[Account Class] = "Revenue"))
+		formatString: #,0
+		displayFolder: P&L\LTM
+		lineageTag: e667daeb-ef3c-5f9b-b621-d349eabf8472
+
+	/// EBITDA, last twelve months, actual.
+	measure 'EBITDA LTM AC' = CALCULATE([Amount LTM AC], KEEPFILTERS('Account'[Account Class] IN {"Revenue", "Cost of Sales", "Operating Expenses"}))
+		formatString: #,0
+		displayFolder: P&L\LTM
+		lineageTag: e1a24cbe-a560-540d-9221-abb4d4f7a058
+
+	/// EBITDA, last twelve months, comparison.
+	measure 'EBITDA LTM PM' = CALCULATE([Amount LTM PM], KEEPFILTERS('Account'[Account Class] IN {"Revenue", "Cost of Sales", "Operating Expenses"}))
+		formatString: #,0
+		displayFolder: P&L\LTM
+		lineageTag: 9a92bc79-8d5e-5b85-9398-4453de5fb58c
+
+	/// EBIT, last twelve months, actual.
+	measure 'EBIT LTM AC' = CALCULATE([Amount LTM AC], KEEPFILTERS('Account'[Account Class] IN {"Revenue", "Cost of Sales", "Operating Expenses", "Depreciation & Amortization"}))
+		formatString: #,0
+		displayFolder: P&L\LTM
+		lineageTag: e18cf632-9189-5a51-b603-1fae2f20da0b
+
+	/// EBIT, last twelve months, comparison.
+	measure 'EBIT LTM PM' = CALCULATE([Amount LTM PM], KEEPFILTERS('Account'[Account Class] IN {"Revenue", "Cost of Sales", "Operating Expenses", "Depreciation & Amortization"}))
+		formatString: #,0
+		displayFolder: P&L\LTM
+		lineageTag: 8c731e6d-0e7c-5b47-b506-bfc35562ac7c
+
+	/// Net Income, last twelve months, actual.
+	measure 'Net Income LTM AC' = CALCULATE([Amount LTM AC], KEEPFILTERS('Account'[Account Class] <> ""))
+		formatString: #,0
+		displayFolder: P&L\LTM
+		lineageTag: 2c62515d-dd7f-5e1c-a6db-45315df280dd
+
+	/// Net Income, last twelve months, comparison.
+	measure 'Net Income LTM PM' = CALCULATE([Amount LTM PM], KEEPFILTERS('Account'[Account Class] <> ""))
+		formatString: #,0
+		displayFolder: P&L\LTM
+		lineageTag: 191cfe23-9ce3-589c-901d-3b39fa9da827
+
+	/// COGS, last twelve months, actual (positive).
+	measure 'COGS LTM AC' = -CALCULATE([Amount LTM AC], KEEPFILTERS('Account'[Account Class] = "Cost of Sales"))
+		formatString: #,0
+		displayFolder: P&L\LTM
+		lineageTag: 712441da-7729-5948-9ecf-8cbaee77420a
+
+	/// COGS, last twelve months, comparison (positive).
+	measure 'COGS LTM PM' = -CALCULATE([Amount LTM PM], KEEPFILTERS('Account'[Account Class] = "Cost of Sales"))
+		formatString: #,0
+		displayFolder: P&L\LTM
+		lineageTag: cd60cdda-c781-55af-b73f-82ae73949f33
+
+	/// Interest Expense, last twelve months, actual (positive).
+	measure 'Interest Expense LTM AC' = -CALCULATE([Amount LTM AC], KEEPFILTERS('Account'[Account] = "Interest Expense"))
+		formatString: #,0
+		displayFolder: P&L\LTM
+		lineageTag: c26c4ede-ccad-508b-a019-10af89131c3d
+
+	/// Interest Expense, last twelve months, comparison (positive).
+	measure 'Interest Expense LTM PM' = -CALCULATE([Amount LTM PM], KEEPFILTERS('Account'[Account] = "Interest Expense"))
+		formatString: #,0
+		displayFolder: P&L\LTM
+		lineageTag: e376fd27-a59b-51b4-a3dd-8b979b7dcb18
+
+	/// Days sales outstanding: receivables over LTM revenue x 365, actual.
+	measure 'DSO AC' = DIVIDE([Receivables AC], [Net Revenue LTM AC]) * 365
+		formatString: 0
+		displayFolder: Working Capital
+		lineageTag: 401c8df6-b76d-5da2-8402-fbb7bc04fb60
+
+	/// Days inventory outstanding: inventory over LTM cost of sales x 365, actual.
+	measure 'DIO AC' = DIVIDE([Inventory AC], [COGS LTM AC]) * 365
+		formatString: 0
+		displayFolder: Working Capital
+		lineageTag: f931690c-8916-52ae-956c-f03d5a724312
+
+	/// Days payables outstanding: payables over LTM cost of sales x 365, actual.
+	measure 'DPO AC' = DIVIDE([Payables AC], [COGS LTM AC]) * 365
+		formatString: 0
+		displayFolder: Working Capital
+		lineageTag: 3798bddd-a3ee-5fa6-b2b8-e8f1ff43ebf6
+
+	/// DSO + DIO - DPO in days, actual.
+	measure 'Cash Conversion Cycle AC' = [DSO AC] + [DIO AC] - [DPO AC]
+		formatString: 0
+		displayFolder: Working Capital
+		lineageTag: 7bf3fd2a-d8de-5ebe-a948-69e02b31576d
+
+	/// Return on equity: LTM net income over equity at period end, actual.
+	measure 'ROE AC' = DIVIDE([Net Income LTM AC], [Total Equity AC])
+		formatString: 0.0%
+		displayFolder: Returns
+		lineageTag: 57a876c2-8fb9-5b04-ae1e-f1a7cbcecf3a
+
+	/// Leverage: net debt over LTM EBITDA, actual.
+	measure 'Net Debt to EBITDA AC' = DIVIDE([Net Debt AC], [EBITDA LTM AC])
+		formatString: 0.00
+		displayFolder: Returns
+		lineageTag: 5ee1136e-dd23-5d3a-9736-49df1028dd2f
+
+	/// LTM EBIT over LTM interest expense, actual.
+	measure 'Interest Coverage AC' = DIVIDE([EBIT LTM AC], [Interest Expense LTM AC])
+		formatString: 0.00
+		displayFolder: Returns
+		lineageTag: 1a752692-a0ca-5faf-a187-f419ff1a61ca
+
+	/// Days sales outstanding: receivables over LTM revenue x 365, comparison.
+	measure 'DSO PM' = DIVIDE([Receivables PM], [Net Revenue LTM PM]) * 365
+		formatString: 0
+		displayFolder: Working Capital
+		lineageTag: 7af7493a-25fc-5a1c-87a9-990bee9d3d0c
+
+	/// Days inventory outstanding: inventory over LTM cost of sales x 365, comparison.
+	measure 'DIO PM' = DIVIDE([Inventory PM], [COGS LTM PM]) * 365
+		formatString: 0
+		displayFolder: Working Capital
+		lineageTag: 5c354166-b253-5fc0-97a6-2b5acb5f18a8
+
+	/// Days payables outstanding: payables over LTM cost of sales x 365, comparison.
+	measure 'DPO PM' = DIVIDE([Payables PM], [COGS LTM PM]) * 365
+		formatString: 0
+		displayFolder: Working Capital
+		lineageTag: 3bd73da4-914d-5c1f-b82f-c791338e97c4
+
+	/// DSO + DIO - DPO in days, comparison.
+	measure 'Cash Conversion Cycle PM' = [DSO PM] + [DIO PM] - [DPO PM]
+		formatString: 0
+		displayFolder: Working Capital
+		lineageTag: 01be59f7-4b5e-52ed-84a1-2ff0a9e6d45d
+
+	/// Return on equity: LTM net income over equity at period end, comparison.
+	measure 'ROE PM' = DIVIDE([Net Income LTM PM], [Total Equity PM])
+		formatString: 0.0%
+		displayFolder: Returns
+		lineageTag: 6940a866-26ce-5d05-a8e5-3bdfd141b662
+
+	/// Leverage: net debt over LTM EBITDA, comparison.
+	measure 'Net Debt to EBITDA PM' = DIVIDE([Net Debt PM], [EBITDA LTM PM])
+		formatString: 0.00
+		displayFolder: Returns
+		lineageTag: 4ada3bb3-0831-53a8-9f7e-7aeebc1f666b
+
+	/// LTM EBIT over LTM interest expense, comparison.
+	measure 'Interest Coverage PM' = DIVIDE([EBIT LTM PM], [Interest Expense LTM PM])
+		formatString: 0.00
+		displayFolder: Returns
+		lineageTag: c1740f1b-636f-550d-ac7f-885d3dae489e
+
+	/// Actual cash flow in the current filter context, no time window.
+	measure 'Cash Flow Actual Amount' = CALCULATE(SUM(FactCF[Amount]), FactCF[Scenario] = "Actual")
+		formatString: #,0
+		displayFolder: Cash Flow\Base
+		lineageTag: dc36d0e0-f39f-5cbe-a335-17b9dd4011f6
+
+	/// Budget cash flow in the current filter context, no time window.
+	measure 'Cash Flow Budget Amount' = CALCULATE(SUM(FactCF[Amount]), FactCF[Scenario] = "Budget")
+		formatString: #,0
+		displayFolder: Cash Flow\Base
+		lineageTag: 2ac300b4-bd27-5234-a66e-ccf4d31ed7f8
+
+	/// Forecast cash flow in the current filter context, no time window.
+	measure 'Cash Flow Forecast Amount' = CALCULATE(SUM(FactCF[Amount]), FactCF[Scenario] = "Forecast")
+		formatString: #,0
+		displayFolder: Cash Flow\Base
+		lineageTag: 76a0aca7-848a-516a-beba-d2115789b223
+
+	/// Actual cash flow for the reporting window.
+	measure 'Cash Flow AC' =
+			VAR _end = [As Of Date]
+			VAR _start = [Period Start]
+			RETURN CALCULATE([Cash Flow Actual Amount], FILTER(ALL('Calendar'), 'Calendar'[Date] >= _start && 'Calendar'[Date] <= _end))
+		formatString: #,0
+		displayFolder: Cash Flow
+		lineageTag: 200a0fd9-6552-50e7-bb97-db73082402ce
+
+	/// Budget cash flow for the reporting window.
+	measure 'Cash Flow BU' =
+			VAR _end = [As Of Date]
+			VAR _start = [Period Start]
+			RETURN CALCULATE([Cash Flow Budget Amount], FILTER(ALL('Calendar'), 'Calendar'[Date] >= _start && 'Calendar'[Date] <= _end))
+		formatString: #,0
+		displayFolder: Cash Flow
+		lineageTag: 8cb45b48-2c40-5bb7-95db-c0287e84c8b9
+
+	/// Forecast cash flow for the reporting window.
+	measure 'Cash Flow FC' =
+			VAR _end = [As Of Date]
+			VAR _start = [Period Start]
+			RETURN CALCULATE([Cash Flow Forecast Amount], FILTER(ALL('Calendar'), 'Calendar'[Date] >= _start && 'Calendar'[Date] <= _end))
+		formatString: #,0
+		displayFolder: Cash Flow
+		lineageTag: 9a291278-7e8b-50f9-8ddb-a45946a5ba64
+
+	/// Actual cash flow for the same window one year earlier.
+	measure 'Cash Flow PY' =
+			VAR _end = [As Of Date]
+			VAR _start = [Period Start]
+			RETURN CALCULATE([Cash Flow Actual Amount], FILTER(ALL('Calendar'), 'Calendar'[Date] >= EDATE(_start, -12) && 'Calendar'[Date] <= EDATE(_end, -12)))
+		formatString: #,0
+		displayFolder: Cash Flow
+		lineageTag: c0b90e67-02b9-5814-9909-00a83995835e
+
+	/// Comparison cash flow for the reporting window, following the Compare toggle.
+	measure 'Cash Flow PM' = SWITCH([Selected Comparison], "Prior Year", [Cash Flow PY], "Forecast", [Cash Flow FC], [Cash Flow BU])
+		formatString: #,0
+		displayFolder: Cash Flow
+		lineageTag: 454e9710-69e5-5726-ace8-55aed685653f
+
+	/// Actual cash flow in the current month context.
+	measure 'Cash Flow Monthly AC' = [Cash Flow Actual Amount]
+		formatString: #,0
+		displayFolder: Cash Flow\Monthly
+		lineageTag: 218583de-73bf-5beb-8e44-f0da7b88cf85
+
+	/// Comparison cash flow in the current month context.
+	measure 'Cash Flow Monthly PM' = SWITCH([Selected Comparison], "Prior Year", CALCULATE([Cash Flow Actual Amount], SAMEPERIODLASTYEAR('Calendar'[Date])), "Forecast", [Cash Flow Forecast Amount], [Cash Flow Budget Amount])
+		formatString: #,0
+		displayFolder: Cash Flow\Monthly
+		lineageTag: b5f55e5b-afaa-527f-937a-800780194271
+
+	/// Operating Cash Flow for the reporting window, actual.
+	measure 'Operating Cash Flow AC' = CALCULATE([Cash Flow AC], KEEPFILTERS('CFLine'[Activity] = "Operating"))
+		formatString: #,0
+		displayFolder: Cash Flow\Lines
+		lineageTag: 4bf00cc8-3c03-5c1b-9e2e-5b924e3dfeac
+
+	/// Investing Cash Flow for the reporting window, actual.
+	measure 'Investing Cash Flow AC' = CALCULATE([Cash Flow AC], KEEPFILTERS('CFLine'[Activity] = "Investing"))
+		formatString: #,0
+		displayFolder: Cash Flow\Lines
+		lineageTag: af21d2c7-bc40-532a-bee2-2f423b7ddad1
+
+	/// Financing Cash Flow for the reporting window, actual.
+	measure 'Financing Cash Flow AC' = CALCULATE([Cash Flow AC], KEEPFILTERS('CFLine'[Activity] = "Financing"))
+		formatString: #,0
+		displayFolder: Cash Flow\Lines
+		lineageTag: 74fba683-0448-5bf2-9088-83ad08cf2788
+
+	/// Free Cash Flow for the reporting window, actual.
+	measure 'Free Cash Flow AC' = CALCULATE([Cash Flow AC], KEEPFILTERS('CFLine'[Activity] IN {"Operating", "Investing"}))
+		formatString: #,0
+		displayFolder: Cash Flow\Lines
+		lineageTag: e959501f-2a73-58f6-80ac-39fff94b7636
+
+	/// Operating + investing + financing cash flow, actual.
+	measure 'Net Change in Cash AC' = [Cash Flow AC]
+		formatString: #,0
+		displayFolder: Cash Flow\Lines
+		lineageTag: b299e792-eac9-5609-91e0-b82551eeca85
+
+	/// Capital expenditure incl. capitalized software (positive), actual.
+	measure 'Capex AC' = -CALCULATE([Cash Flow AC], KEEPFILTERS('CFLine'[CF Metric] IN {"CAPEX", "CAPSW"}))
+		formatString: #,0
+		displayFolder: Cash Flow\Lines
+		lineageTag: 8657bae6-e2df-5b2b-a2e5-7b517035fca8
+
+	/// Operating cash flow over EBITDA, actual.
+	measure 'Cash Conversion % AC' = DIVIDE([Operating Cash Flow AC], [EBITDA AC])
+		formatString: 0.0%
+		displayFolder: Cash Flow\Lines
+		lineageTag: 81fcabcf-1c64-5352-98fa-4826206e9880
+
+	/// Free cash flow in the current month context, actual.
+	measure 'Free Cash Flow Monthly AC' = CALCULATE([Cash Flow Monthly AC], KEEPFILTERS('CFLine'[Activity] IN {"Operating", "Investing"}))
+		formatString: #,0
+		displayFolder: Cash Flow\Monthly
+		lineageTag: 0d52c33f-eb68-5717-aa80-0083dc46b834
+
+	/// Operating cash flow in the current month context, actual.
+	measure 'Operating Cash Flow Monthly AC' = CALCULATE([Cash Flow Monthly AC], KEEPFILTERS('CFLine'[Activity] = "Operating"))
+		formatString: #,0
+		displayFolder: Cash Flow\Monthly
+		lineageTag: 39674584-4453-571d-b46a-281609ba43ba
+
+	/// Operating Cash Flow for the reporting window, comparison.
+	measure 'Operating Cash Flow PM' = CALCULATE([Cash Flow PM], KEEPFILTERS('CFLine'[Activity] = "Operating"))
+		formatString: #,0
+		displayFolder: Cash Flow\Lines
+		lineageTag: cf731690-adad-5f94-a279-98f12780eac5
+
+	/// Investing Cash Flow for the reporting window, comparison.
+	measure 'Investing Cash Flow PM' = CALCULATE([Cash Flow PM], KEEPFILTERS('CFLine'[Activity] = "Investing"))
+		formatString: #,0
+		displayFolder: Cash Flow\Lines
+		lineageTag: 629d9ac0-19cc-5ece-a06b-c4607a9b2a6c
+
+	/// Financing Cash Flow for the reporting window, comparison.
+	measure 'Financing Cash Flow PM' = CALCULATE([Cash Flow PM], KEEPFILTERS('CFLine'[Activity] = "Financing"))
+		formatString: #,0
+		displayFolder: Cash Flow\Lines
+		lineageTag: 3d97a799-b2c2-56e1-8bc7-092a0a67b806
+
+	/// Free Cash Flow for the reporting window, comparison.
+	measure 'Free Cash Flow PM' = CALCULATE([Cash Flow PM], KEEPFILTERS('CFLine'[Activity] IN {"Operating", "Investing"}))
+		formatString: #,0
+		displayFolder: Cash Flow\Lines
+		lineageTag: 6227b117-e6b2-5653-ab17-441374887f21
+
+	/// Operating + investing + financing cash flow, comparison.
+	measure 'Net Change in Cash PM' = [Cash Flow PM]
+		formatString: #,0
+		displayFolder: Cash Flow\Lines
+		lineageTag: e8e2e98f-dc9a-545c-ad92-2b5f8eef3253
+
+	/// Capital expenditure incl. capitalized software (positive), comparison.
+	measure 'Capex PM' = -CALCULATE([Cash Flow PM], KEEPFILTERS('CFLine'[CF Metric] IN {"CAPEX", "CAPSW"}))
+		formatString: #,0
+		displayFolder: Cash Flow\Lines
+		lineageTag: e0d67b4b-1b76-593a-bbb9-c5588ac3f221
+
+	/// Operating cash flow over EBITDA, comparison.
+	measure 'Cash Conversion % PM' = DIVIDE([Operating Cash Flow PM], [EBITDA PM])
+		formatString: 0.0%
+		displayFolder: Cash Flow\Lines
+		lineageTag: 8cb472ee-023c-5bc1-8dd5-f5e8c93dc10b
+
+	/// Free cash flow in the current month context, comparison.
+	measure 'Free Cash Flow Monthly PM' = CALCULATE([Cash Flow Monthly PM], KEEPFILTERS('CFLine'[Activity] IN {"Operating", "Investing"}))
+		formatString: #,0
+		displayFolder: Cash Flow\Monthly
+		lineageTag: 762d3449-ada0-52db-84f3-dca70d635c35
+
+	/// Operating cash flow in the current month context, comparison.
+	measure 'Operating Cash Flow Monthly PM' = CALCULATE([Cash Flow Monthly PM], KEEPFILTERS('CFLine'[Activity] = "Operating"))
+		formatString: #,0
+		displayFolder: Cash Flow\Monthly
+		lineageTag: 1fdfcb69-f947-5f9c-a0da-8f56554c2a18
+
+	/// Cash at the start of the reporting window (closing cash less the window's net cash flow).
+	measure 'Opening Cash AC' = [Cash AC] - [Net Change in Cash AC]
+		formatString: #,0
+		displayFolder: Cash Flow
+		lineageTag: c3b12eb0-538f-57ae-a3b9-a23cfac2bdf9
+
+	/// Forecast net revenue in the current month context (segmented AC + FC chart).
+	measure 'Net Revenue Monthly FC' = CALCULATE([Forecast Amount], KEEPFILTERS('Account'[Account Class] = "Revenue"))
+		formatString: #,0
+		displayFolder: IBCS Visuals
+		lineageTag: bab41491-93e0-545d-abf9-423205df5b3d
+
+	/// Scenario code FC, for visuals that take the comparison label from a measure.
+	measure 'Scenario FC' = "FC"
+		displayFolder: IBCS Visuals
+		lineageTag: 4f4636a5-1712-5f9d-8304-b5afd97bb230
+
+	/// Actual gross margin in the current month context (combo chart line).
+	measure 'Gross Margin % Monthly AC' = DIVIDE([Gross Profit Monthly AC], [Net Revenue Monthly AC])
+		formatString: 0.0%
+		displayFolder: IBCS Visuals
+		lineageTag: 98ebbba6-f89d-5d31-a00a-10ade3a18dd3
+
+	/// Operating expenses as a positive amount, prior year, for the reporting window.
+	measure 'OPEX PY' = -[Operating Expenses PY]
+		formatString: #,0
+		displayFolder: IBCS Visuals
+		lineageTag: 808948fa-7820-5316-bf65-11655502f8d3
+
+	/// P&L amount for a whole year: actual for closed years, the full-year forecast for the current year.
+	measure 'Tree Amount' =
+			VAR _y = MAX('Calendar'[Year])
+			VAR _fc = _y >= YEAR([Last Closed Date])
+			RETURN IF(_fc, [Forecast Amount], [Actual Amount])
+		formatString: #,0
+		displayFolder: IBCS Visuals\Tree
+		lineageTag: 5c07834a-ea1d-5ed5-b752-6c57bed7b245
+
+	/// Net income for the year (all P&L accounts), actual or full-year forecast.
+	measure 'Tree Net Income' = [Tree Amount]
+		formatString: #,0
+		displayFolder: IBCS Visuals\Tree
+		lineageTag: bb8e9468-0fea-5616-8648-b62c2b36c4ff
+
+	/// Net revenue for the year, actual or full-year forecast.
+	measure 'Tree Net Revenue' = CALCULATE([Tree Amount], KEEPFILTERS('Account'[Account Class] = "Revenue"))
+		formatString: #,0
+		displayFolder: IBCS Visuals\Tree
+		lineageTag: 987e3259-4558-5f63-a567-7fee3f4dea7c
+
+	/// Total assets at year end (December), actual or forecast.
+	measure 'Tree Assets' =
+			VAR _y = MAX('Calendar'[Year])
+			VAR _fc = _y >= YEAR([Last Closed Date])
+			VAR _scn = IF(_fc, "Forecast", "Actual")
+			RETURN CALCULATE(SUM(FactBS[Balance]), FactBS[Scenario] = _scn, 'BSAccount'[BS Level 1] = "Assets", FILTER(ALL('Calendar'), 'Calendar'[Date] = DATE(_y, 12, 1)))
+		formatString: #,0
+		displayFolder: IBCS Visuals\Tree
+		lineageTag: b0e72bb5-54c7-5552-a16f-7687d42f8f5a
+
+	/// Net income over net revenue for the year.
+	measure 'Tree Return on Sales' = DIVIDE([Tree Net Income], [Tree Net Revenue])
+		formatString: 0.0%
+		displayFolder: IBCS Visuals\Tree
+		lineageTag: 833fc23b-8904-5e08-b516-d2fe7807bb65
+
+	/// Net revenue over year-end total assets.
+	measure 'Tree Asset Turnover' = DIVIDE([Tree Net Revenue], [Tree Assets])
+		formatString: 0.00
+		displayFolder: IBCS Visuals\Tree
+		lineageTag: c601eb87-b971-5c04-b122-bfbba557d42e
+
+	/// Return on assets: net income over year-end total assets (= return on sales x asset turnover).
+	measure 'Tree ROA' = DIVIDE([Tree Net Income], [Tree Assets])
+		formatString: 0.0%
+		displayFolder: IBCS Visuals\Tree
+		lineageTag: 9abbda76-0dcd-563f-a7cc-3db1299bc18f
+
+	column Value
+		dataType: int64
+		isHidden
+		lineageTag: 60c498e2-d4cb-5e32-bb5b-76a33b301c1e
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Value]
+
+	partition _Measures = calculated
+		mode: import
+		source = { BLANK() }
+
+	annotation PBI_Id = d29729d0c57c5d72b70e55ff0ebca73c
+

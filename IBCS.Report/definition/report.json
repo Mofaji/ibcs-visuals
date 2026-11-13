@@ -1,0 +1,246 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/report/3.3.0/schema.json",
+  "themeCollection": {
+    "baseTheme": {
+      "name": "CY26SU02",
+      "reportVersionAtImport": {
+        "visual": "2.6.0",
+        "report": "3.1.0",
+        "page": "2.3.0"
+      },
+      "type": "SharedResources"
+    },
+    "customTheme": {
+      "name": "IBCSTheme.json",
+      "reportVersionAtImport": {
+        "visual": "2.6.0",
+        "report": "3.1.0",
+        "page": "2.3.0"
+      },
+      "type": "RegisteredResources"
+    }
+  },
+  "objects": {
+    "section": [
+      {
+        "properties": {
+          "verticalAlignment": {
+            "expr": {
+              "Literal": {
+                "Value": "'Top'"
+              }
+            }
+          }
+        }
+      }
+    ],
+    "outspacePane": [
+      {
+        "properties": {
+          "expanded": {
+            "expr": {
+              "Literal": {
+                "Value": "false"
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "resourcePackages": [
+    {
+      "name": "SharedResources",
+      "type": "SharedResources",
+      "items": [
+        {
+          "name": "CY26SU02",
+          "path": "BaseThemes/CY26SU02.json",
+          "type": "BaseTheme"
+        }
+      ]
+    },
+    {
+      "name": "RegisteredResources",
+      "type": "RegisteredResources",
+      "items": [
+        {
+          "name": "bg_p01_multitier.svg",
+          "path": "bg_p01_multitier.svg",
+          "type": "Image"
+        },
+        {
+          "name": "bg_p02_waterfalls.svg",
+          "path": "bg_p02_waterfalls.svg",
+          "type": "Image"
+        },
+        {
+          "name": "bg_p03_lines.svg",
+          "path": "bg_p03_lines.svg",
+          "type": "Image"
+        },
+        {
+          "name": "bg_p04_scatter.svg",
+          "path": "bg_p04_scatter.svg",
+          "type": "Image"
+        },
+        {
+          "name": "bg_p05_c12c13.svg",
+          "path": "bg_p05_c12c13.svg",
+          "type": "Image"
+        },
+        {
+          "name": "bg_p06_t01.svg",
+          "path": "bg_p06_t01.svg",
+          "type": "Image"
+        },
+        {
+          "name": "bg_p07_t02.svg",
+          "path": "bg_p07_t02.svg",
+          "type": "Image"
+        },
+        {
+          "name": "bg_p08_t03.svg",
+          "path": "bg_p08_t03.svg",
+          "type": "Image"
+        },
+        {
+          "name": "bg_p09_t04.svg",
+          "path": "bg_p09_t04.svg",
+          "type": "Image"
+        },
+        {
+          "name": "bg_p10_integrated.svg",
+          "path": "bg_p10_integrated.svg",
+          "type": "Image"
+        },
+        {
+          "name": "bg_p11_segcombo.svg",
+          "path": "bg_p11_segcombo.svg",
+          "type": "Image"
+        },
+        {
+          "name": "bg_p12_dots.svg",
+          "path": "bg_p12_dots.svg",
+          "type": "Image"
+        },
+        {
+          "name": "bg_p13_stacked.svg",
+          "path": "bg_p13_stacked.svg",
+          "type": "Image"
+        },
+        {
+          "name": "bg_p14_cards.svg",
+          "path": "bg_p14_cards.svg",
+          "type": "Image"
+        },
+        {
+          "name": "IBCSTheme.json",
+          "path": "IBCSTheme.json",
+          "type": "CustomTheme"
+        },
+        {
+          "name": "logo.png",
+          "path": "logo.png",
+          "type": "Image"
+        }
+      ]
+    },
+    {
+      "name": "finVarianceBarsE91363896AE34AE2A96AE99E545CB2A2",
+      "type": "CustomVisual",
+      "items": [
+        {
+          "name": "finVarianceBarsE91363896AE34AE2A96AE99E545CB2A2.pbiviz.json",
+          "path": "finVarianceBarsE91363896AE34AE2A96AE99E545CB2A2.pbiviz.json",
+          "type": "CustomVisualMetadata"
+        }
+      ]
+    },
+    {
+      "name": "finVarianceChartA5D6C9DF32014AF78ED46AC9EC460877",
+      "type": "CustomVisual",
+      "items": [
+        {
+          "name": "finVarianceChartA5D6C9DF32014AF78ED46AC9EC460877.pbiviz.json",
+          "path": "finVarianceChartA5D6C9DF32014AF78ED46AC9EC460877.pbiviz.json",
+          "type": "CustomVisualMetadata"
+        }
+      ]
+    },
+    {
+      "name": "finVarianceTable110350F4FE3C462DB9780C576BB24F2D",
+      "type": "CustomVisual",
+      "items": [
+        {
+          "name": "finVarianceTable110350F4FE3C462DB9780C576BB24F2D.pbiviz.json",
+          "path": "finVarianceTable110350F4FE3C462DB9780C576BB24F2D.pbiviz.json",
+          "type": "CustomVisualMetadata"
+        }
+      ]
+    },
+    {
+      "name": "finWaterfall7603FD2D59F44F1DAE4A9FDD2D503191",
+      "type": "CustomVisual",
+      "items": [
+        {
+          "name": "finWaterfall7603FD2D59F44F1DAE4A9FDD2D503191.pbiviz.json",
+          "path": "finWaterfall7603FD2D59F44F1DAE4A9FDD2D503191.pbiviz.json",
+          "type": "CustomVisualMetadata"
+        }
+      ]
+    },
+    {
+      "name": "ibcsSeries4168E0C8777C41E3A2D1AAA6638B5D25",
+      "type": "CustomVisual",
+      "items": [
+        {
+          "name": "ibcsSeries4168E0C8777C41E3A2D1AAA6638B5D25.pbiviz.json",
+          "path": "ibcsSeries4168E0C8777C41E3A2D1AAA6638B5D25.pbiviz.json",
+          "type": "CustomVisualMetadata"
+        }
+      ]
+    },
+    {
+      "name": "ibcsScatter654A432B7AA9479EAC18E9430E54469C",
+      "type": "CustomVisual",
+      "items": [
+        {
+          "name": "ibcsScatter654A432B7AA9479EAC18E9430E54469C.pbiviz.json",
+          "path": "ibcsScatter654A432B7AA9479EAC18E9430E54469C.pbiviz.json",
+          "type": "CustomVisualMetadata"
+        }
+      ]
+    },
+    {
+      "name": "ibcsMultiplesB9599ECA142C47BCA9DEA2F6B38565CD",
+      "type": "CustomVisual",
+      "items": [
+        {
+          "name": "ibcsMultiplesB9599ECA142C47BCA9DEA2F6B38565CD.pbiviz.json",
+          "path": "ibcsMultiplesB9599ECA142C47BCA9DEA2F6B38565CD.pbiviz.json",
+          "type": "CustomVisualMetadata"
+        }
+      ]
+    },
+    {
+      "name": "ibcsCardsFEEACD80288B404D9FA2AD5E9F82B305",
+      "type": "CustomVisual",
+      "items": [
+        {
+          "name": "ibcsCardsFEEACD80288B404D9FA2AD5E9F82B305.pbiviz.json",
+          "path": "ibcsCardsFEEACD80288B404D9FA2AD5E9F82B305.pbiviz.json",
+          "type": "CustomVisualMetadata"
+        }
+      ]
+    }
+  ],
+  "settings": {
+    "useStylableVisualContainerHeader": true,
+    "exportDataMode": "AllowSummarized",
+    "defaultDrillFilterOtherVisuals": true,
+    "allowChangeFilterTypes": true,
+    "useEnhancedTooltips": true,
+    "useDefaultAggregateDisplayName": true
+  }
+}

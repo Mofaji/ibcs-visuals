@@ -1,0 +1,17 @@
+{
+		"version": "1.0.0.3",
+		"author": {"name":"Faizaan","email":"Contact@faizaan.me"},
+		"resources": [
+			{
+				"resourceId": "rId0",
+				"sourceType": 5,
+				"file": "resources/finWaterfall7603FD2D59F44F1DAE4A9FDD2D503191.pbiviz.json"
+			}
+		],
+		"visual": {"name":"finWaterfall","displayName":"IBCS Bridge Chart","guid":"finWaterfall7603FD2D59F44F1DAE4A9FDD2D503191","visualClassName":"Visual","version":"1.0.0.3","description":"IBCS waterfall: profit cascade, plan-to-actual variance bridge and cash bridge","supportUrl":"https://learn.microsoft.com/power-bi/developer/visuals/","gitHubUrl":""},
+		"metadata": {
+			"pbivizjson": {
+				"resourceId": "rId0"
+			}
+		}
+	}

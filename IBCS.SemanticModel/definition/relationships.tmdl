@@ -1,0 +1,68 @@
+relationship 69e9aaf3-abfb-5849-b93b-b747403551a1
+	fromColumn: FactPL.Date
+	toColumn: Calendar.Date
+
+relationship 44866953-44a8-50d4-a9c8-6d6289925cfe
+	fromColumn: FactPL.AccountKey
+	toColumn: Account.AccountKey
+
+relationship 9cda73e6-1d39-55b7-8fb1-e1924af5a544
+	fromColumn: FactPL.BUKey
+	toColumn: BusinessUnit.BUKey
+
+relationship ac9d9250-ca90-5f43-a37d-41666f841e1a
+	fromColumn: FactPL.RegionKey
+	toColumn: Region.RegionKey
+
+relationship 0fe0529b-36e2-5014-aece-4fdf0f29140b
+	fromColumn: FactPL.ProductKey
+	toColumn: Product.ProductKey
+
+relationship 3532d290-4c84-5bf7-be5a-e0c02353cfb9
+	fromColumn: FactPL.ChannelKey
+	toColumn: SalesChannel.ChannelKey
+
+relationship f98356d9-8472-5c17-b3d4-a94e7dc835bb
+	fromColumn: FactPL.DepartmentKey
+	toColumn: Department.DepartmentKey
+
+relationship b86b31f3-087c-506f-ba7a-d654c6e52347
+	fromColumn: FactBS.Date
+	toColumn: Calendar.Date
+
+relationship 0b8d98dc-2c6f-5ed8-b5b1-50e2380601be
+	fromColumn: FactBS.BSAccountKey
+	toColumn: BSAccount.BSAccountKey
+
+relationship 712c0269-9313-50b2-98f9-20b10c795482
+	fromColumn: FactBS.RegionKey
+	toColumn: Region.RegionKey
+
+relationship 1a917824-ff9e-5e56-80e4-a9481147304a
+	fromColumn: FactCF.Date
+	toColumn: Calendar.Date
+
+relationship 597a55b4-d3d3-5604-905e-f6de63449bf5
+	fromColumn: FactCF.CFLineKey
+	toColumn: CFLine.CFLineKey
+
+relationship 4991d84f-496b-52f5-afbd-7f1aa52f1c80
+	fromColumn: FactCF.RegionKey
+	toColumn: Region.RegionKey
+
+relationship 9364716c-98e3-5f89-803e-95035b467257
+	fromColumn: FactHeadcount.Date
+	toColumn: Calendar.Date
+
+relationship eb266cea-df78-5bf2-bdc9-cde49dec46b7
+	fromColumn: FactHeadcount.BUKey
+	toColumn: BusinessUnit.BUKey
+
+relationship a5bdcc4a-07cb-57de-801d-cccbf247146f
+	fromColumn: FactHeadcount.RegionKey
+	toColumn: Region.RegionKey
+
+relationship 674fc29f-4a3a-5064-871b-402cdb7ad6cc
+	fromColumn: FactHeadcount.DepartmentKey
+	toColumn: Department.DepartmentKey
+

@@ -1,0 +1,45 @@
+/// Cost centres. Operating expenses and headcount are booked by department.
+table Department
+	lineageTag: a6df256d-7ba2-5a00-a561-b5da635520ce
+
+	column DepartmentKey
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: f81fea17-4ed1-59cc-bd90-9084ebd220b6
+		summarizeBy: none
+		sourceColumn: DepartmentKey
+
+	column Department
+		dataType: string
+		lineageTag: 8a3c3534-f751-5e81-81f0-f576f8b49cda
+		summarizeBy: none
+		sourceColumn: Department
+		sortByColumn: 'Department Order'
+
+	column Function
+		dataType: string
+		lineageTag: ece6ed0c-31a1-5cde-a21c-3e65acc0ca12
+		summarizeBy: none
+		sourceColumn: Function
+
+	column 'Department Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 2c56e1ab-ccc5-5994-947c-c9ec0124a3e9
+		summarizeBy: none
+		sourceColumn: Department Order
+
+	partition Department = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "DimDepartment.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"DepartmentKey", Int64.Type}, {"Department", type text}, {"Function", type text}, {"Department Order", Int64.Type}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+

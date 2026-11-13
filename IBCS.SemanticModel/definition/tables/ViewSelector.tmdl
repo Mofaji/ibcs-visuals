@@ -1,0 +1,25 @@
+/// Disconnected table behind the View toggle (reporting window).
+table ViewSelector
+	lineageTag: 81344fd4-34f7-5cef-b053-61f13143d6eb
+
+	column View
+		dataType: string
+		lineageTag: d69b4abb-31cc-5d7b-aad8-6b692fe7b326
+		summarizeBy: none
+		sourceColumn: View
+		sortByColumn: 'View Order'
+
+	column 'View Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: aa2050dd-e6ec-50f9-b57e-7a0decce803c
+		summarizeBy: none
+		sourceColumn: View Order
+
+	partition ViewSelector = m
+		mode: import
+		source = #table(type table [View = text, #"View Order" = Int64.Type], {{"YTD", 1}, {"QTD", 2}, {"MTD", 3}})
+
+	annotation PBI_ResultType = Table
+

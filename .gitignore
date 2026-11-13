@@ -1,0 +1,12 @@
+# Power BI Desktop local state: machine-bound, rewritten on every open
+**/.pbi/
+*.abf
+
+# secrets and editor noise
+.env
+.env.*
+.vscode/
+*.log
+*.tmp
+node_modules/
+__pycache__/

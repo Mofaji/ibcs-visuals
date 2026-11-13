@@ -1,0 +1,10 @@
+DepartmentKey,Department,Function,Department Order
+0,Not Applicable,Not Applicable,99
+1,Sales,Commercial,1
+2,Marketing,Commercial,2
+3,Research & Development,Product,3
+4,Operations,Operations,4
+5,Finance,G&A,5
+6,Human Resources,G&A,6
+7,Information Technology,G&A,7
+8,Executive Office,G&A,8

@@ -1,0 +1,17 @@
+{
+		"version": "1.0.0.2",
+		"author": {"name":"Faizaan","email":"Contact@faizaan.me"},
+		"resources": [
+			{
+				"resourceId": "rId0",
+				"sourceType": 5,
+				"file": "resources/finVarianceChartA5D6C9DF32014AF78ED46AC9EC460877.pbiviz.json"
+			}
+		],
+		"visual": {"name":"finVarianceChart","displayName":"IBCS Period Chart","guid":"finVarianceChartA5D6C9DF32014AF78ED46AC9EC460877","visualClassName":"Visual","version":"1.0.0.2","description":"IBCS period chart: actual vs comparison scenario with variance strip","supportUrl":"https://learn.microsoft.com/power-bi/developer/visuals/","gitHubUrl":""},
+		"metadata": {
+			"pbivizjson": {
+				"resourceId": "rId0"
+			}
+		}
+	}

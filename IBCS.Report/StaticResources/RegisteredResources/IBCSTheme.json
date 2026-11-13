@@ -1,0 +1,46 @@
+{
+  "name": "IBCSTheme.json",
+  "dataColors": [
+    "#3B4252",
+    "#3D63DD",
+    "#13A1A0",
+    "#F2A93B",
+    "#8B5CF6",
+    "#E0464E",
+    "#1E9E6A",
+    "#64748B"
+  ],
+  "background": "#FFFFFF",
+  "foreground": "#1A2233",
+  "tableAccent": "#3B4252",
+  "maximum": "#1E9E6A",
+  "minimum": "#E0464E",
+  "null": "#A9B1BE",
+  "textClasses": {
+    "label": {
+      "color": "#566175",
+      "fontSize": 9,
+      "fontFace": "Segoe UI"
+    },
+    "callout": {
+      "color": "#1A2233",
+      "fontSize": 24,
+      "fontFace": "Segoe UI Semibold"
+    },
+    "title": {
+      "color": "#1A2233",
+      "fontSize": 12,
+      "fontFace": "Segoe UI Semibold"
+    },
+    "header": {
+      "color": "#1A2233",
+      "fontSize": 11,
+      "fontFace": "Segoe UI Semibold"
+    },
+    "largeTitle": {
+      "color": "#1A2233",
+      "fontSize": 18,
+      "fontFace": "Segoe UI Semibold"
+    }
+  }
+}

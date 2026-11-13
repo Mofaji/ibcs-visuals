@@ -1,0 +1,116 @@
+/// Daily calendar 2024-2026. Period Status marks months whose actuals are closed.
+table Calendar
+	lineageTag: 648196db-830c-5bde-b87a-8e4766fe2d82
+	dataCategory: Time
+
+	column Date
+		dataType: dateTime
+		isKey
+		formatString: dd mmm yyyy
+		lineageTag: 5bc40899-8eb8-5b95-89fc-38a3cfb439b5
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Year
+		dataType: int64
+		formatString: 0
+		lineageTag: 9440f8af-375a-54fa-b825-468204b487c2
+		summarizeBy: none
+		sourceColumn: Year
+		sortByColumn: 'Year Sort'
+
+	column 'Year Sort'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 0288a973-fa6b-5e17-b96c-ed1ccbe0b82c
+		summarizeBy: none
+		sourceColumn: Year Sort
+
+	column 'Quarter Num'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 38fa3a51-2d0d-5949-adcc-912e97f590f0
+		summarizeBy: none
+		sourceColumn: Quarter Num
+
+	column Quarter
+		dataType: string
+		lineageTag: 8625ac51-79b2-5c37-92e2-5a08034b7537
+		summarizeBy: none
+		sourceColumn: Quarter
+		sortByColumn: 'Quarter Num'
+
+	column 'Year Quarter'
+		dataType: string
+		lineageTag: 83027748-9e85-5551-a814-941dd6c40b02
+		summarizeBy: none
+		sourceColumn: Year Quarter
+
+	column 'Month Num'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 420ebf9e-7873-551f-99ef-2c10f1dff0b3
+		summarizeBy: none
+		sourceColumn: Month Num
+
+	column Month
+		dataType: string
+		lineageTag: 558dfeee-ef4a-5397-b244-1885905d37a5
+		summarizeBy: none
+		sourceColumn: Month
+		sortByColumn: 'Month Num'
+
+	column 'Month Name'
+		dataType: string
+		lineageTag: d609d4b9-2f5e-5714-beec-059c7b2d79f7
+		summarizeBy: none
+		sourceColumn: Month Name
+		sortByColumn: 'Month Num'
+
+	column 'Month Start'
+		dataType: dateTime
+		formatString: mmm yyyy
+		lineageTag: 99533d65-ba9d-5896-b9c0-8fbf09ec215c
+		summarizeBy: none
+		sourceColumn: Month Start
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Month Label'
+		dataType: string
+		lineageTag: 18350d2a-2d5d-5abf-a9e4-267a45708976
+		summarizeBy: none
+		sourceColumn: Month Label
+		sortByColumn: 'Year Month'
+
+	column 'Year Month'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 8d4784bd-cf24-51b0-a177-d99fd177c81a
+		summarizeBy: none
+		sourceColumn: Year Month
+
+	column 'Period Status'
+		dataType: string
+		lineageTag: ad055614-2885-551e-9e21-cfc0ac44f877
+		summarizeBy: none
+		sourceColumn: Period Status
+
+	partition Calendar = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "DimCalendar.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"Date", type date}, {"Year", Int64.Type}, {"Year Sort", Int64.Type}, {"Quarter Num", Int64.Type}, {"Quarter", type text}, {"Year Quarter", type text}, {"Month Num", Int64.Type}, {"Month", type text}, {"Month Name", type text}, {"Month Start", type date}, {"Month Label", type text}, {"Year Month", Int64.Type}, {"Period Status", type text}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+

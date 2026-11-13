@@ -1,0 +1,76 @@
+/// Cash flow statement lines (indirect method). Sections are running results.
+table CFLine
+	lineageTag: b338b68b-19d7-5a60-86f8-27b21f1bd943
+
+	column CFLineKey
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 06dd94ce-e7a1-546a-92ee-748965aefe05
+		summarizeBy: none
+		sourceColumn: CFLineKey
+
+	column 'Cash Flow Line'
+		dataType: string
+		lineageTag: 5d3b322f-438e-5e86-9c84-5e3066d9eb17
+		summarizeBy: none
+		sourceColumn: Cash Flow Line
+		sortByColumn: 'Line Order'
+
+	column 'Cash Flow Section'
+		dataType: string
+		lineageTag: 197d0bda-6522-5d3e-9a7a-076b35d507fb
+		summarizeBy: none
+		sourceColumn: Cash Flow Section
+		sortByColumn: 'Section Order'
+
+	column 'Section Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 69f927d6-356b-5c16-88bd-c85c0dce2596
+		summarizeBy: none
+		sourceColumn: Section Order
+
+	column Activity
+		dataType: string
+		lineageTag: 37b48426-29cc-54f5-b694-dafb18c51e10
+		summarizeBy: none
+		sourceColumn: Activity
+		sortByColumn: 'Activity Order'
+
+	column 'Activity Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 6b58b2d0-e0a8-5812-a85f-3f8d925260b3
+		summarizeBy: none
+		sourceColumn: Activity Order
+
+	column 'Line Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 7df5bfce-a490-5f7c-a24b-719277d07b7b
+		summarizeBy: none
+		sourceColumn: Line Order
+
+	column 'CF Metric'
+		dataType: string
+		isHidden
+		lineageTag: 5bd7938f-43bb-5265-8e27-6d0e25618e68
+		summarizeBy: none
+		sourceColumn: CF Metric
+
+	partition CFLine = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "DimCFLine.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"CFLineKey", Int64.Type}, {"Cash Flow Line", type text}, {"Cash Flow Section", type text}, {"Section Order", Int64.Type}, {"Activity", type text}, {"Activity Order", Int64.Type}, {"Line Order", Int64.Type}, {"CF Metric", type text}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+

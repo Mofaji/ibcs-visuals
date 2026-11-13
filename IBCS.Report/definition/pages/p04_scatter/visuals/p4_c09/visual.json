@@ -1,0 +1,226 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "p4_c09",
+  "position": {
+    "x": 34,
+    "y": 104,
+    "z": 1010,
+    "height": 464,
+    "width": 590,
+    "tabOrder": 1010
+  },
+  "visual": {
+    "visualType": "ibcsScatter654A432B7AA9479EAC18E9430E54469C",
+    "query": {
+      "queryState": {
+        "category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Product"
+                    }
+                  },
+                  "Property": "Product Line"
+                }
+              },
+              "queryRef": "Product.Product Line",
+              "nativeQueryRef": "Product Line"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Region"
+                    }
+                  },
+                  "Property": "Region"
+                }
+              },
+              "queryRef": "Region.Region",
+              "nativeQueryRef": "Region"
+            }
+          ]
+        },
+        "series": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Product"
+                    }
+                  },
+                  "Property": "Product BU"
+                }
+              },
+              "queryRef": "Product.Product BU",
+              "nativeQueryRef": "Product BU"
+            }
+          ]
+        },
+        "x": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Net Revenue AC"
+                }
+              },
+              "queryRef": "_Measures.Net Revenue AC",
+              "nativeQueryRef": "Net Revenue AC",
+              "displayName": "Net revenue"
+            }
+          ]
+        },
+        "y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Gross Margin % AC"
+                }
+              },
+              "queryRef": "_Measures.Gross Margin % AC",
+              "nativeQueryRef": "Gross Margin % AC",
+              "displayName": "Gross margin"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "chart": [
+        {
+          "properties": {
+            "xFormat": {
+              "expr": {
+                "Literal": {
+                  "Value": "'K'"
+                }
+              }
+            },
+            "yFormat": {
+              "expr": {
+                "Literal": {
+                  "Value": "'pct'"
+                }
+              }
+            },
+            "xTitle": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Net revenue, USD K'"
+                }
+              }
+            },
+            "yTitle": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Gross margin %'"
+                }
+              }
+            },
+            "isoLines": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "isoLabel": {
+              "expr": {
+                "Literal": {
+                  "Value": "'GP'"
+                }
+              }
+            },
+            "pointLabels": {
+              "expr": {
+                "Literal": {
+                  "Value": "'none'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "9D"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "dropShadow": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

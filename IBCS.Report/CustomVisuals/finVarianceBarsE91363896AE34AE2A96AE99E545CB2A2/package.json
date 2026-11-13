@@ -1,0 +1,17 @@
+{
+		"version": "1.0.0.2",
+		"author": {"name":"Faizaan","email":"Contact@faizaan.me"},
+		"resources": [
+			{
+				"resourceId": "rId0",
+				"sourceType": 5,
+				"file": "resources/finVarianceBarsE91363896AE34AE2A96AE99E545CB2A2.pbiviz.json"
+			}
+		],
+		"visual": {"name":"finVarianceBars","displayName":"IBCS Variance Bars","guid":"finVarianceBarsE91363896AE34AE2A96AE99E545CB2A2","visualClassName":"Visual","version":"1.0.0.2","description":"IBCS horizontal bar chart: actual with comparison marker, absolute and relative variances","supportUrl":"https://learn.microsoft.com/power-bi/developer/visuals/","gitHubUrl":""},
+		"metadata": {
+			"pbivizjson": {
+				"resourceId": "rId0"
+			}
+		}
+	}

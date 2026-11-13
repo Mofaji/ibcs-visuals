@@ -1,0 +1,14 @@
+CFLineKey,Cash Flow Line,Cash Flow Section,Section Order,Activity,Activity Order,Line Order,CF Metric
+1,Net Income,Cash from Operations,1,Operating,1,1,NI
+2,Depreciation & Amortization,Cash from Operations,1,Operating,1,2,DA
+3,Change in Receivables,Cash from Operations,1,Operating,1,3,dAR
+4,Change in Inventory,Cash from Operations,1,Operating,1,4,dINV
+5,Change in Prepaids,Cash from Operations,1,Operating,1,5,dPREP
+6,Change in Payables,Cash from Operations,1,Operating,1,6,dAP
+7,Change in Accrued Liabilities,Cash from Operations,1,Operating,1,7,dACCR
+8,Change in Tax Payable,Cash from Operations,1,Operating,1,8,dTAX
+9,Capital Expenditure,Free Cash Flow,2,Investing,2,9,CAPEX
+10,Capitalized Software,Free Cash Flow,2,Investing,2,10,CAPSW
+11,Debt Drawdowns,Net Change in Cash,3,Financing,3,11,DRAW
+12,Debt Repayments,Net Change in Cash,3,Financing,3,12,REPAY
+13,Dividends Paid,Net Change in Cash,3,Financing,3,13,DIV

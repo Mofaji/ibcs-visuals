@@ -1,0 +1,18 @@
+/// SVG KPI cards and page subtitles, prefixed by page (P1_ = Navigation ... P9_ = Finance 360).
+table _SVG_Measures
+	lineageTag: 94788879-f1c2-5ae1-a66d-f8a5537f6b72
+
+	column Value
+		dataType: int64
+		isHidden
+		lineageTag: f97c0865-5162-5f9b-bc56-bcf9f46215c2
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Value]
+
+	partition _SVG_Measures = calculated
+		mode: import
+		source = { BLANK() }
+
+	annotation PBI_Id = 2f399ecf44e75bafb001e3820071d172
+
