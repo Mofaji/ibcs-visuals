@@ -261,27 +261,27 @@ Fields: `BusinessUnit[Business Unit]`, `Product[Product Line]`, `Calendar[Quarte
 
 ## IBCS template coverage
 
-The IBCS Association publishes 13 chart templates (C01 to C13) and 4 table templates (T01 to T04). This report builds 16 of the 17, plus eight further forms the templates do not name.
+The IBCS Association publishes 13 chart templates (C01 to C13) and 4 table templates (T01 to T04). The captions on the report pages number the charts in reading order (C1 to C12) and keep T01 to T04 for the tables; the table below maps them to the official IBCS codes. This report builds 16 of the 17, plus eight further forms the templates do not name.
 
-| Template | Name | Where |
-| --- | --- | --- |
-| C01 | Stacked column charts | Page 13 |
-| C02 | Stacked bar charts | Page 13 |
-| C03 | Multi-tier column charts | Page 1 |
-| C04 | Multi-tier bar charts | Page 1 |
-| C05 | Columns with horizontal waterfall charts | Page 2 |
-| C06 | Bars with vertical waterfall charts | Page 2 |
-| C07 | Line charts | Page 3 |
-| C08 | Area charts | Page 3 |
-| C09 | Scattergrams | Page 4 |
-| C10 | Bubble charts | Page 4 |
-| C11 | Tree charts | not in this report |
-| C12 | Vertical waterfalls | Page 5 |
-| C13 | Small multiples | Page 5 |
-| T01 | Table with hierarchical rows and variance columns | Page 6 |
-| T02 | Table with hierarchical rows and integrated bar charts | Page 7 |
-| T03 | Table with measure rows | Page 8 |
-| T04 | Table with measure rows and integrated waterfalls | Page 9 |
+| Template | Name | Caption on the page | Where |
+| --- | --- | --- | --- |
+| C01 | Stacked column charts | C11 | Page 13 |
+| C02 | Stacked bar charts | C12 | Page 13 |
+| C03 | Multi-tier column charts | C1 | Page 1 |
+| C04 | Multi-tier bar charts | C2 | Page 1 |
+| C05 | Columns with horizontal waterfall charts | C3 | Page 2 |
+| C06 | Bars with vertical waterfall charts | C4 | Page 2 |
+| C07 | Line charts | C5 | Page 3 |
+| C08 | Area charts | C6 | Page 3 |
+| C09 | Scattergrams | C7 | Page 4 |
+| C10 | Bubble charts | C8 | Page 4 |
+| C11 | Tree charts | not in this report | not in this report |
+| C12 | Vertical waterfalls | C9 | Page 5 |
+| C13 | Small multiples | C10 | Page 5 |
+| T01 | Table with hierarchical rows and variance columns | T01 | Page 6 |
+| T02 | Table with hierarchical rows and integrated bar charts | T02 | Page 7 |
+| T03 | Table with measure rows | T03 | Page 8 |
+| T04 | Table with measure rows and integrated waterfalls | T04 | Page 9 |
 
 Further forms: integrated variance columns and hills and valleys (page 10), segmented actual and forecast and a combo chart (page 11), a dot plot and a waterfall over time (page 12), KPI cards and a cross table (page 14).
 
